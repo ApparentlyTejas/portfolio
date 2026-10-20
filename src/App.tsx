@@ -396,7 +396,7 @@ function App() {
           <div className="info-cards">
             <div className="info-card"><span>Status</span>Open to internships</div>
             <div className="info-card"><span>Location</span>Erlangen, Germany</div>
-            <div className="info-card"><span>Languages</span>English (C2), German (A2)</div>
+            <div className="info-card"><span>Languages</span>English (C2), German (A2, actively studying)</div>
           </div>
           <div className="contact-links">
             <a href="mailto:tejas.malhotra.14@gmail.com">Email</a>
