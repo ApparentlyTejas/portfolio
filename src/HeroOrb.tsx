@@ -19,14 +19,14 @@ function Orb() {
 
   return (
     <Float speed={0.8} rotationIntensity={0.08} floatIntensity={0.35}>
-      <mesh ref={mesh} scale={1.4}>
+      <mesh ref={mesh} scale={1.5}>
         <icosahedronGeometry args={[1, 32]} />
         <MeshDistortMaterial
-          color="#b9802f"
+          color="#cba86e"
           roughness={0.3}
-          metalness={0.85}
-          distort={0.16}
-          speed={0.6}
+          metalness={0.3}
+          distort={0.1}
+          speed={0.5}
         />
       </mesh>
     </Float>
@@ -43,10 +43,11 @@ export default function HeroOrb() {
       gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
       style={{ position: 'absolute', inset: 0 }}
     >
-      <ambientLight intensity={0.6} color="#3a2a16" />
-      <directionalLight position={[4, 5, 3]} intensity={1.3} color="#ffe4b8" />
-      <directionalLight position={[-4, -2, -3]} intensity={0.45} color="#8a6440" />
-      <pointLight position={[0, 1, 4]} intensity={0.4} color="#fff3dd" />
+      <ambientLight intensity={0.85} color="#6b5636" />
+      <directionalLight position={[4, 5, 4]} intensity={2.6} color="#fff0d2" />
+      <directionalLight position={[-5, 1, 2]} intensity={1.1} color="#ffd9a0" />
+      <directionalLight position={[0, -4, -3]} intensity={0.6} color="#8a6440" />
+      <pointLight position={[0, 1, 5]} intensity={0.8} color="#ffffff" />
       <Orb />
     </Canvas>
   )
