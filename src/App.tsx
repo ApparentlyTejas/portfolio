@@ -159,6 +159,7 @@ const EASE = [0.16, 1, 0.3, 1] as const
 
 function App() {
   const [booted, setBooted] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
   useEffect(() => {
     const id = requestAnimationFrame(() => setBooted(true))
     return () => cancelAnimationFrame(id)
@@ -169,12 +170,31 @@ function App() {
       <CursorGlow />
       <header className="navbar">
         <a href="#home" className="brand">tejas malhotra</a>
-        <nav>
+        <nav className="nav-desktop">
           {NAV_LINKS.map((l) => (
             <a key={l.href} href={l.href}>{l.label}</a>
           ))}
         </nav>
+        <button
+          className={`menu-btn ${menuOpen ? 'open' : ''}`}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={menuOpen}
+          onClick={() => setMenuOpen((v) => !v)}
+        >
+          <span />
+          <span />
+        </button>
       </header>
+
+      {menuOpen && (
+        <nav className="nav-mobile">
+          {NAV_LINKS.map((l) => (
+            <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}>
+              {l.label}
+            </a>
+          ))}
+        </nav>
+      )}
 
       <section id="home" className="hero-section">
         <div className="hero-canvas">

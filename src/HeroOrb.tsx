@@ -71,11 +71,14 @@ function Orb() {
 }
 
 export default function HeroOrb() {
+  const isSmall = typeof window !== 'undefined' && window.innerWidth < 720
+  const isCoarse = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+
   return (
     <Canvas
       camera={{ position: [0, 0, 8], fov: 38 }}
-      dpr={[1, 1.8]}
-      gl={{ antialias: true, alpha: true }}
+      dpr={isSmall ? [1, 1.2] : [1, 1.8]}
+      gl={{ antialias: !isCoarse, alpha: true, powerPreference: 'low-power' }}
       style={{ position: 'absolute', inset: 0 }}
     >
       <ambientLight intensity={0.55} />
@@ -84,9 +87,11 @@ export default function HeroOrb() {
       <pointLight position={[0, 0, 4]} intensity={0.6} color="#ffffff" />
       <pointLight position={[-3, 2, 2]} intensity={0.3} color="#c9a8ff" />
       <Orb />
-      <EffectComposer>
-        <Bloom intensity={0.3} luminanceThreshold={0.55} luminanceSmoothing={0.25} mipmapBlur />
-      </EffectComposer>
+      {!isCoarse && (
+        <EffectComposer>
+          <Bloom intensity={0.3} luminanceThreshold={0.55} luminanceSmoothing={0.25} mipmapBlur />
+        </EffectComposer>
+      )}
     </Canvas>
   )
 }
