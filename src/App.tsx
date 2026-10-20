@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import NetworkScene from './NetworkScene'
+import HeroOrb from './HeroOrb'
 import TiltCard from './TiltCard'
 import CursorGlow from './CursorGlow'
 import MagneticButton from './MagneticButton'
@@ -179,7 +179,7 @@ function App() {
       <section id="home" className="hero-section">
         <div className="hero-canvas">
           <Suspense fallback={null}>
-            <NetworkScene />
+            <HeroOrb />
           </Suspense>
         </div>
         <div className="hero-fade" />

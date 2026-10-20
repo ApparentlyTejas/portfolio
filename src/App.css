@@ -89,13 +89,15 @@ h3 {
 .hero-canvas {
   position: absolute;
   inset: 0;
-  opacity: 0.9;
+  opacity: 0.85;
 }
 
 .hero-fade {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 42%, transparent 0%, transparent 28%, var(--bg) 78%);
+  background:
+    radial-gradient(ellipse 60% 48% at 50% 38%, transparent 0%, rgba(5, 7, 13, 0.55) 55%, var(--bg) 85%),
+    linear-gradient(to bottom, transparent 0%, transparent 55%, var(--bg) 96%);
   pointer-events: none;
 }
 
