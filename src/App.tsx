@@ -68,6 +68,7 @@ const PROJECTS = [
     ],
     tags: ['Python', 'FastAPI', 'PostgreSQL', 'Docker', 'Locust'],
     github: 'https://github.com/ApparentlyTejas/RoomLock',
+    demo: 'https://bookingapi-i4cg.onrender.com/',
   },
   {
     id: '03',

@@ -233,7 +233,7 @@ h3 {
 
 .btn-primary {
   background: var(--accent-blue);
-  color: #0b0b0d;
+  color: #0a0a0b;
   font-weight: 600;
   border: none;
 }
@@ -269,8 +269,14 @@ h3 {
 /* Skills */
 .skills-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 18px;
+}
+
+@media (max-width: 900px) {
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .project-card,
@@ -334,8 +340,14 @@ h3 {
 /* Projects */
 .projects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
+}
+
+@media (max-width: 860px) {
+  .projects-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .project-card:hover,
