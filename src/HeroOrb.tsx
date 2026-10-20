@@ -4,7 +4,7 @@ import { Float, MeshDistortMaterial } from '@react-three/drei'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
-const HUES = [0.6, 0.68, 0.76, 0.68]
+const HUES = [0.06, 0.1, 0.13, 0.09]
 
 function useCyclingColor(speed: number, offset: number) {
   const color = useRef(new THREE.Color())
@@ -13,7 +13,7 @@ function useCyclingColor(speed: number, offset: number) {
     const i = Math.floor(cycle)
     const f = cycle - i
     const h = THREE.MathUtils.lerp(HUES[i], HUES[i + 1], f)
-    color.current.setHSL(h, 0.42, 0.52)
+    color.current.setHSL(h, 0.58, 0.5)
     return color.current
   }
 }
@@ -47,9 +47,9 @@ function Orb() {
       <mesh ref={mesh} scale={1.3}>
         <icosahedronGeometry args={[1, 24]} />
         <MeshDistortMaterial
-          color="#3d6fd8"
-          roughness={0.28}
-          metalness={0.5}
+          color="#c97b3c"
+          roughness={0.24}
+          metalness={0.7}
           distort={0.34}
           speed={1.4}
         />
@@ -57,13 +57,13 @@ function Orb() {
       <mesh ref={inner} scale={0.78}>
         <icosahedronGeometry args={[1, 16]} />
         <MeshDistortMaterial
-          color="#8b6cf0"
-          roughness={0.25}
-          metalness={0.5}
+          color="#f0c874"
+          roughness={0.2}
+          metalness={0.75}
           distort={0.38}
           speed={1.0}
           transparent
-          opacity={0.45}
+          opacity={0.5}
         />
       </mesh>
     </Float>
@@ -81,11 +81,11 @@ export default function HeroOrb() {
       gl={{ antialias: !isCoarse, alpha: true, powerPreference: 'low-power' }}
       style={{ position: 'absolute', inset: 0 }}
     >
-      <ambientLight intensity={0.55} />
-      <directionalLight position={[4, 5, 3]} intensity={1.4} color="#aecbff" />
-      <directionalLight position={[-4, -2, -3]} intensity={0.7} color="#bc8cff" />
-      <pointLight position={[0, 0, 4]} intensity={0.6} color="#ffffff" />
-      <pointLight position={[-3, 2, 2]} intensity={0.3} color="#c9a8ff" />
+      <ambientLight intensity={0.5} color="#2a1c10" />
+      <directionalLight position={[4, 5, 3]} intensity={1.5} color="#ffd9a0" />
+      <directionalLight position={[-4, -2, -3]} intensity={0.75} color="#e88a4a" />
+      <pointLight position={[0, 0, 4]} intensity={0.6} color="#fff3dd" />
+      <pointLight position={[-3, 2, 2]} intensity={0.35} color="#ffb673" />
       <Orb />
       {!isCoarse && (
         <EffectComposer>
