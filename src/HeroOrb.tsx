@@ -1,6 +1,6 @@
-import { Suspense, useRef } from 'react'
+import { useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
-import { Environment, Float, MeshDistortMaterial } from '@react-three/drei'
+import { Float, MeshDistortMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 
 function Orb() {
@@ -17,34 +17,32 @@ function Orb() {
       inner.current.rotation.y = -t * 0.05
     }
     const scrollT = Math.min(window.scrollY / (window.innerHeight * 0.9), 1)
-    camera.position.z = 6.2 + scrollT * 2.5
+    camera.position.z = 8 + scrollT * 2.5
     camera.position.y = -scrollT * 1.1
   })
 
   return (
     <Float speed={1.2} rotationIntensity={0.25} floatIntensity={0.7}>
-      <mesh ref={mesh} scale={2.1}>
+      <mesh ref={mesh} scale={1.3}>
         <icosahedronGeometry args={[1, 24]} />
         <MeshDistortMaterial
           color="#3d6fd8"
-          roughness={0.12}
-          metalness={0.65}
+          roughness={0.35}
+          metalness={0.4}
           distort={0.32}
           speed={1.4}
-          envMapIntensity={1.4}
         />
       </mesh>
-      <mesh ref={inner} scale={1.25}>
+      <mesh ref={inner} scale={0.78}>
         <icosahedronGeometry args={[1, 16]} />
         <MeshDistortMaterial
           color="#8b6cf0"
-          roughness={0.05}
-          metalness={0.8}
+          roughness={0.3}
+          metalness={0.45}
           distort={0.45}
           speed={1.1}
           transparent
           opacity={0.55}
-          envMapIntensity={1.2}
         />
       </mesh>
     </Float>
@@ -54,18 +52,16 @@ function Orb() {
 export default function HeroOrb() {
   return (
     <Canvas
-      camera={{ position: [0, 0, 6.2], fov: 42 }}
+      camera={{ position: [0, 0, 8], fov: 38 }}
       dpr={[1, 1.8]}
       gl={{ antialias: true, alpha: true }}
       style={{ position: 'absolute', inset: 0 }}
     >
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[4, 5, 3]} intensity={1.1} color="#aecbff" />
-      <directionalLight position={[-4, -2, -3]} intensity={0.5} color="#bc8cff" />
-      <Suspense fallback={null}>
-        <Orb />
-        <Environment preset="city" />
-      </Suspense>
+      <ambientLight intensity={0.55} />
+      <directionalLight position={[4, 5, 3]} intensity={1.4} color="#aecbff" />
+      <directionalLight position={[-4, -2, -3]} intensity={0.7} color="#bc8cff" />
+      <pointLight position={[0, 0, 4]} intensity={0.6} color="#ffffff" />
+      <Orb />
     </Canvas>
   )
 }
