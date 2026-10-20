@@ -254,7 +254,7 @@ function App() {
           >
             <a href="#projects" className="btn btn-primary">View Projects</a>
             <a href="#contact" className="btn btn-ghost">Get in Touch</a>
-            <a href={`${import.meta.env.BASE_URL}resume.pdf`} className="btn btn-ghost" target="_blank" rel="noreferrer">Resume</a>
+            <a href={`${import.meta.env.BASE_URL}resume.pdf`} className="btn btn-ghost">Resume</a>
           </motion.div>
         </div>
       </section>
