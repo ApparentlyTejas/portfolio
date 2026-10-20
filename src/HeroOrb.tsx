@@ -1,69 +1,32 @@
 import { useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, MeshDistortMaterial } from '@react-three/drei'
-import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import * as THREE from 'three'
-
-const HUES = [0.06, 0.1, 0.13, 0.09]
-
-function useCyclingColor(speed: number, offset: number) {
-  const color = useRef(new THREE.Color())
-  return (t: number) => {
-    const cycle = ((t * speed + offset) % 1) * (HUES.length - 1)
-    const i = Math.floor(cycle)
-    const f = cycle - i
-    const h = THREE.MathUtils.lerp(HUES[i], HUES[i + 1], f)
-    color.current.setHSL(h, 0.58, 0.5)
-    return color.current
-  }
-}
 
 function Orb() {
   const mesh = useRef<THREE.Mesh>(null)
-  const inner = useRef<THREE.Mesh>(null)
-  const getOuterColor = useCyclingColor(0.045, 0)
-  const getInnerColor = useCyclingColor(0.045, 0.5)
 
   useFrame(({ clock, pointer, camera }) => {
     const t = clock.getElapsedTime()
     if (mesh.current) {
-      mesh.current.rotation.y = t * 0.08 + pointer.x * 0.25
-      mesh.current.rotation.x = pointer.y * 0.15
-      const mat = mesh.current.material as THREE.MeshStandardMaterial
-      mat.color = getOuterColor(t)
-    }
-    if (inner.current) {
-      inner.current.rotation.y = -t * 0.05
-      const mat = inner.current.material as THREE.MeshStandardMaterial
-      mat.color = getInnerColor(t)
+      mesh.current.rotation.y = t * 0.035 + pointer.x * 0.12
+      mesh.current.rotation.x = pointer.y * 0.06
     }
     const scrollT = Math.min(window.scrollY / (window.innerHeight * 0.9), 1)
-    camera.position.z = 8 + scrollT * 2.5
-    camera.position.y = -scrollT * 1.1
+    camera.position.z = 8 + scrollT * 2
+    camera.position.y = -scrollT * 0.8
   })
 
   return (
-    <Float speed={1.2} rotationIntensity={0.25} floatIntensity={0.7}>
-      <mesh ref={mesh} scale={1.3}>
-        <icosahedronGeometry args={[1, 24]} />
+    <Float speed={0.8} rotationIntensity={0.08} floatIntensity={0.35}>
+      <mesh ref={mesh} scale={1.4}>
+        <icosahedronGeometry args={[1, 32]} />
         <MeshDistortMaterial
-          color="#c97b3c"
-          roughness={0.24}
-          metalness={0.7}
-          distort={0.34}
-          speed={1.4}
-        />
-      </mesh>
-      <mesh ref={inner} scale={0.78}>
-        <icosahedronGeometry args={[1, 16]} />
-        <MeshDistortMaterial
-          color="#f0c874"
-          roughness={0.2}
-          metalness={0.75}
-          distort={0.38}
-          speed={1.0}
-          transparent
-          opacity={0.5}
+          color="#b9802f"
+          roughness={0.3}
+          metalness={0.85}
+          distort={0.16}
+          speed={0.6}
         />
       </mesh>
     </Float>
@@ -72,26 +35,19 @@ function Orb() {
 
 export default function HeroOrb() {
   const isSmall = typeof window !== 'undefined' && window.innerWidth < 720
-  const isCoarse = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
 
   return (
     <Canvas
       camera={{ position: [0, 0, 8], fov: 38 }}
-      dpr={isSmall ? [1, 1.2] : [1, 1.8]}
-      gl={{ antialias: !isCoarse, alpha: true, powerPreference: 'low-power' }}
+      dpr={isSmall ? [1, 1.2] : [1, 1.6]}
+      gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
       style={{ position: 'absolute', inset: 0 }}
     >
-      <ambientLight intensity={0.5} color="#2a1c10" />
-      <directionalLight position={[4, 5, 3]} intensity={1.5} color="#ffd9a0" />
-      <directionalLight position={[-4, -2, -3]} intensity={0.75} color="#e88a4a" />
-      <pointLight position={[0, 0, 4]} intensity={0.6} color="#fff3dd" />
-      <pointLight position={[-3, 2, 2]} intensity={0.35} color="#ffb673" />
+      <ambientLight intensity={0.6} color="#3a2a16" />
+      <directionalLight position={[4, 5, 3]} intensity={1.3} color="#ffe4b8" />
+      <directionalLight position={[-4, -2, -3]} intensity={0.45} color="#8a6440" />
+      <pointLight position={[0, 1, 4]} intensity={0.4} color="#fff3dd" />
       <Orb />
-      {!isCoarse && (
-        <EffectComposer>
-          <Bloom intensity={0.3} luminanceThreshold={0.55} luminanceSmoothing={0.25} mipmapBlur />
-        </EffectComposer>
-      )}
     </Canvas>
   )
 }

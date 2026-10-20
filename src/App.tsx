@@ -1,9 +1,6 @@
 import { Suspense, useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import HeroOrb from './HeroOrb'
-import TiltCard from './TiltCard'
-import CursorGlow from './CursorGlow'
-import MagneticButton from './MagneticButton'
 import './App.css'
 
 const NAV_LINKS = [
@@ -167,7 +164,6 @@ function App() {
 
   return (
     <>
-      <CursorGlow />
       <header className="navbar">
         <a href="#home" className="brand">tejas malhotra</a>
         <nav className="nav-desktop">
@@ -255,9 +251,9 @@ function App() {
             animate={booted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 1.25, ease: EASE }}
           >
-            <MagneticButton href="#projects" className="btn btn-primary">View Projects</MagneticButton>
-            <MagneticButton href="#contact" className="btn btn-ghost">Get in Touch</MagneticButton>
-            <MagneticButton href={`${import.meta.env.BASE_URL}resume.pdf`} className="btn btn-ghost" target="_blank" rel="noreferrer">Resume</MagneticButton>
+            <a href="#projects" className="btn btn-primary">View Projects</a>
+            <a href="#contact" className="btn btn-ghost">Get in Touch</a>
+            <a href={`${import.meta.env.BASE_URL}resume.pdf`} className="btn btn-ghost" target="_blank" rel="noreferrer">Resume</a>
           </motion.div>
         </div>
       </section>
@@ -293,7 +289,7 @@ function App() {
         <CommandHeader>$ skills --stack</CommandHeader>
         <div className="skills-grid">
           {SKILLS.map((s) => (
-            <TiltCard className="skill-card" key={s.label}>
+            <div className="skill-card" key={s.label}>
               <div className="skill-card-head">
                 <span>{s.label}</span>
                 <span className="skill-count">{s.count}</span>
@@ -303,7 +299,7 @@ function App() {
                   <li key={i}>{i}</li>
                 ))}
               </ul>
-            </TiltCard>
+            </div>
           ))}
         </div>
       </Section>
@@ -312,7 +308,7 @@ function App() {
         <CommandHeader>$ projects --selected</CommandHeader>
         <div className="projects-grid">
           {PROJECTS.map((p) => (
-            <TiltCard className="project-card" key={p.id}>
+            <div className="project-card" key={p.id}>
               <div className="project-head">
                 <span className="project-category">{p.category}</span>
               </div>
@@ -334,7 +330,7 @@ function App() {
                   <a href={p.demo} target="_blank" rel="noreferrer">Live Demo &rarr;</a>
                 )}
               </div>
-            </TiltCard>
+            </div>
           ))}
         </div>
       </Section>
@@ -343,7 +339,7 @@ function App() {
         <CommandHeader>$ experience --all</CommandHeader>
         <div className="timeline">
           {EXPERIENCE.map((e) => (
-            <TiltCard className="timeline-card" key={e.role + e.company}>
+            <div className="timeline-card" key={e.role + e.company}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.role}</h3>
@@ -361,7 +357,7 @@ function App() {
                   <span className="tag tag-sm" key={t}>{t}</span>
                 ))}
               </div>
-            </TiltCard>
+            </div>
           ))}
         </div>
       </Section>
@@ -370,7 +366,7 @@ function App() {
         <CommandHeader>$ education --history</CommandHeader>
         <div className="timeline">
           {EDUCATION.map((e) => (
-            <TiltCard className="timeline-card" key={e.degree}>
+            <div className="timeline-card" key={e.degree}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.degree}</h3>
@@ -383,7 +379,7 @@ function App() {
                   <li key={b}>{b}</li>
                 ))}
               </ul>
-            </TiltCard>
+            </div>
           ))}
         </div>
       </Section>
