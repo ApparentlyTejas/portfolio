@@ -4,7 +4,7 @@ import { Float, MeshDistortMaterial } from '@react-three/drei'
 import { Bloom, EffectComposer } from '@react-three/postprocessing'
 import * as THREE from 'three'
 
-const HUES = [0.58, 0.66, 0.78, 0.9, 0.66]
+const HUES = [0.6, 0.68, 0.76, 0.68]
 
 function useCyclingColor(speed: number, offset: number) {
   const color = useRef(new THREE.Color())
@@ -13,32 +13,9 @@ function useCyclingColor(speed: number, offset: number) {
     const i = Math.floor(cycle)
     const f = cycle - i
     const h = THREE.MathUtils.lerp(HUES[i], HUES[i + 1], f)
-    color.current.setHSL(h, 0.75, 0.62)
+    color.current.setHSL(h, 0.42, 0.52)
     return color.current
   }
-}
-
-function Glow() {
-  const ref = useRef<THREE.Mesh>(null)
-  const getColor = useCyclingColor(0.045, 0.3)
-  useFrame(({ clock }) => {
-    if (!ref.current) return
-    const mat = ref.current.material as THREE.MeshBasicMaterial
-    mat.color = getColor(clock.getElapsedTime())
-  })
-  return (
-    <mesh ref={ref} scale={2.1}>
-      <sphereGeometry args={[1, 32, 32]} />
-      <meshBasicMaterial
-        color="#5a7dff"
-        transparent
-        opacity={0.16}
-        side={THREE.BackSide}
-        blending={THREE.AdditiveBlending}
-        depthWrite={false}
-      />
-    </mesh>
-  )
 }
 
 function Orb() {
@@ -67,7 +44,6 @@ function Orb() {
 
   return (
     <Float speed={1.2} rotationIntensity={0.25} floatIntensity={0.7}>
-      <Glow />
       <mesh ref={mesh} scale={1.3}>
         <icosahedronGeometry args={[1, 24]} />
         <MeshDistortMaterial
@@ -82,12 +58,12 @@ function Orb() {
         <icosahedronGeometry args={[1, 16]} />
         <MeshDistortMaterial
           color="#8b6cf0"
-          roughness={0.22}
-          metalness={0.55}
-          distort={0.5}
-          speed={1.1}
+          roughness={0.25}
+          metalness={0.5}
+          distort={0.38}
+          speed={1.0}
           transparent
-          opacity={0.6}
+          opacity={0.45}
         />
       </mesh>
     </Float>
@@ -106,10 +82,10 @@ export default function HeroOrb() {
       <directionalLight position={[4, 5, 3]} intensity={1.4} color="#aecbff" />
       <directionalLight position={[-4, -2, -3]} intensity={0.7} color="#bc8cff" />
       <pointLight position={[0, 0, 4]} intensity={0.6} color="#ffffff" />
-      <pointLight position={[-3, 2, 2]} intensity={0.5} color="#ff8cd6" />
+      <pointLight position={[-3, 2, 2]} intensity={0.3} color="#c9a8ff" />
       <Orb />
       <EffectComposer>
-        <Bloom intensity={0.55} luminanceThreshold={0.25} luminanceSmoothing={0.3} mipmapBlur />
+        <Bloom intensity={0.3} luminanceThreshold={0.55} luminanceSmoothing={0.25} mipmapBlur />
       </EffectComposer>
     </Canvas>
   )
