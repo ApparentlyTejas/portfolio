@@ -1,3 +1,9 @@
+import { Suspense, useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
+import NetworkScene from './NetworkScene'
+import TiltCard from './TiltCard'
+import CursorGlow from './CursorGlow'
+import MagneticButton from './MagneticButton'
 import './App.css'
 
 const NAV_LINKS = [
@@ -149,9 +155,18 @@ function CommandHeader({ children }: { children: string }) {
   return <h2 className="command-header">{children}</h2>
 }
 
+const EASE = [0.16, 1, 0.3, 1] as const
+
 function App() {
+  const [booted, setBooted] = useState(false)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => setBooted(true))
+    return () => cancelAnimationFrame(id)
+  }, [])
+
   return (
     <>
+      <CursorGlow />
       <header className="navbar">
         <a href="#home" className="brand">tejas malhotra</a>
         <nav>
@@ -161,31 +176,71 @@ function App() {
         </nav>
       </header>
 
-      <Section id="home">
+      <section id="home" className="hero-section">
+        <div className="hero-canvas">
+          <Suspense fallback={null}>
+            <NetworkScene />
+          </Suspense>
+        </div>
+        <div className="hero-fade" />
         <div className="hero">
-          <span className="badge">
+          <motion.span
+            className="badge"
+            initial={{ opacity: 0, y: 10 }}
+            animate={booted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, ease: EASE }}
+          >
             <span className="dot" /> M.Sc. ICT @ FAU Erlangen &middot; Open to internships
-          </span>
-          <h1>
-            Hi, I'm Tejas<span className="accent"> {'{'} {'}'}</span>
+          </motion.span>
+
+          <h1 className="hero-title" aria-label="Hi, I'm Tejas">
+            {'Hi, I’m Tejas'.split('').map((ch, i) => (
+              <motion.span
+                key={i}
+                className="char"
+                initial={{ opacity: 0, y: 28, rotateX: -40 }}
+                animate={booted ? { opacity: 1, y: 0, rotateX: 0 } : {}}
+                transition={{ duration: 0.7, delay: 0.25 + i * 0.022, ease: EASE }}
+              >
+                {ch === ' ' ? ' ' : ch}
+              </motion.span>
+            ))}
           </h1>
-          <p className="hero-sub">
+
+          <motion.p
+            className="hero-sub"
+            initial={{ opacity: 0, y: 14 }}
+            animate={booted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 0.95, ease: EASE }}
+          >
             I build across the stack: backend APIs, distributed systems, full-stack apps,
             and MCP tooling that lets AI agents act on real systems. I lean toward projects
             that get tested against real conditions, not just demoed once and shipped.
-          </p>
-          <div className="tag-row">
+          </motion.p>
+
+          <motion.div
+            className="tag-row"
+            initial={{ opacity: 0, y: 14 }}
+            animate={booted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 1.1, ease: EASE }}
+          >
             <span className="tag">Distributed Systems</span>
             <span className="tag">Backend Engineering</span>
             <span className="tag">AI &amp; MCP Tooling</span>
-          </div>
-          <div className="hero-actions">
-            <a href="#projects" className="btn btn-primary">View Projects</a>
-            <a href="#contact" className="btn btn-ghost">Get in Touch</a>
-            <a href="/resume.pdf" className="btn btn-ghost" target="_blank" rel="noreferrer">Resume</a>
-          </div>
+          </motion.div>
+
+          <motion.div
+            className="hero-actions"
+            initial={{ opacity: 0, y: 14 }}
+            animate={booted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7, delay: 1.25, ease: EASE }}
+          >
+            <MagneticButton href="#projects" className="btn btn-primary">View Projects</MagneticButton>
+            <MagneticButton href="#contact" className="btn btn-ghost">Get in Touch</MagneticButton>
+            <MagneticButton href={`${import.meta.env.BASE_URL}resume.pdf`} className="btn btn-ghost" target="_blank" rel="noreferrer">Resume</MagneticButton>
+          </motion.div>
         </div>
-      </Section>
+      </section>
 
       <Section id="about">
         <CommandHeader>$ about --me</CommandHeader>
@@ -218,7 +273,7 @@ function App() {
         <CommandHeader>$ skills --stack</CommandHeader>
         <div className="skills-grid">
           {SKILLS.map((s) => (
-            <div className="skill-card" key={s.label}>
+            <TiltCard className="skill-card" key={s.label}>
               <div className="skill-card-head">
                 <span>{s.label}</span>
                 <span className="skill-count">{s.count}</span>
@@ -228,7 +283,7 @@ function App() {
                   <li key={i}>{i}</li>
                 ))}
               </ul>
-            </div>
+            </TiltCard>
           ))}
         </div>
       </Section>
@@ -237,9 +292,8 @@ function App() {
         <CommandHeader>$ projects --selected</CommandHeader>
         <div className="projects-grid">
           {PROJECTS.map((p) => (
-            <article className="project-card" key={p.id}>
+            <TiltCard className="project-card" key={p.id}>
               <div className="project-head">
-                <span className="project-id">{p.id}</span>
                 <span className="project-category">{p.category}</span>
               </div>
               <h3>{p.title}</h3>
@@ -260,7 +314,7 @@ function App() {
                   <a href={p.demo} target="_blank" rel="noreferrer">Live Demo &rarr;</a>
                 )}
               </div>
-            </article>
+            </TiltCard>
           ))}
         </div>
       </Section>
@@ -269,7 +323,7 @@ function App() {
         <CommandHeader>$ experience --all</CommandHeader>
         <div className="timeline">
           {EXPERIENCE.map((e) => (
-            <div className="timeline-card" key={e.role + e.company}>
+            <TiltCard className="timeline-card" key={e.role + e.company}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.role}</h3>
@@ -287,7 +341,7 @@ function App() {
                   <span className="tag tag-sm" key={t}>{t}</span>
                 ))}
               </div>
-            </div>
+            </TiltCard>
           ))}
         </div>
       </Section>
@@ -296,7 +350,7 @@ function App() {
         <CommandHeader>$ education --history</CommandHeader>
         <div className="timeline">
           {EDUCATION.map((e) => (
-            <div className="timeline-card" key={e.degree}>
+            <TiltCard className="timeline-card" key={e.degree}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.degree}</h3>
@@ -309,7 +363,7 @@ function App() {
                   <li key={b}>{b}</li>
                 ))}
               </ul>
-            </div>
+            </TiltCard>
           ))}
         </div>
       </Section>
