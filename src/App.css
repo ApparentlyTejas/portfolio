@@ -266,6 +266,29 @@ h3 {
   font-size: 15.5px;
 }
 
+.about-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.about-list li {
+  color: var(--text-dim);
+  line-height: 1.7;
+  font-size: 15.5px;
+  padding-left: 20px;
+  position: relative;
+}
+
+.about-list li::before {
+  content: '\2192';
+  position: absolute;
+  left: 0;
+  color: var(--text-dimmer);
+}
+
 /* Skills */
 .skills-grid {
   display: grid;

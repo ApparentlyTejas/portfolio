@@ -16,7 +16,7 @@ const SKILLS = [
   {
     label: 'Backend & APIs',
     count: 6,
-    items: ['Python', 'FastAPI', 'REST APIs', 'Pydantic', 'JWT Auth', 'MCP Servers'],
+    items: ['Python', 'FastAPI / Flask', 'REST APIs', 'Pydantic', 'JWT Auth', 'MCP Servers'],
   },
   {
     label: 'Databases & Distributed Systems',
@@ -30,13 +30,13 @@ const SKILLS = [
   },
   {
     label: 'Cloud & DevOps',
-    count: 6,
-    items: ['AWS (EC2, S3, RDS, VPC)', 'Docker', 'GitHub Actions', 'GitLab CI/CD', 'Git', 'Load Testing (Locust)'],
+    count: 7,
+    items: ['AWS (EC2, S3, RDS, VPC, EKS)', 'Multi-tier deployments', 'Docker', 'GitHub Actions', 'GitLab CI/CD', 'Git', 'Load Testing (Locust)'],
   },
   {
     label: 'Full-Stack',
-    count: 4,
-    items: ['React', 'TypeScript', 'Vite', 'HttpOnly-Cookie Auth'],
+    count: 5,
+    items: ['React', 'TypeScript', 'Vite', 'HttpOnly-Cookie Auth', 'C++'],
   },
 ]
 
@@ -263,26 +263,28 @@ function App() {
         <CommandHeader>$ about --me</CommandHeader>
         <div className="about-grid">
           <p>
-            I'm an M.Sc. student in Information and Communication Technology at
-            Friedrich-Alexander-Universit&auml;t Erlangen-N&uuml;rnberg, focused on distributed systems
-            and backend development, with a B.Tech in Electronics and Communication Engineering
-            from Manipal University Jaipur.
+            I build across the stack: backend APIs, full-stack web apps, AI features, and MCP
+            tooling. I lean toward projects that get tested against real conditions, not just
+            demoed once and shipped.
           </p>
-          <p>
-            I test things by actually breaking them: race conditions under real concurrent load,
-            clean-checkout runs, chasing down query-planner behavior instead of trusting the first
-            benchmark number. Most of my projects start from a real failure mode I found, not a
-            feature list.
-          </p>
-          <p>
-            Lately that means backend APIs and distributed data systems, LLM-powered features with
-            schema-validated structured output, and building MCP servers and tools that let models
-            act on real systems rather than just talk about them.
-          </p>
-          <p>
-            Currently exploring internship and working student opportunities in software engineering,
-            based in Erlangen, Germany.
-          </p>
+          <ul className="about-list">
+            <li>
+              I test things by actually breaking them: race conditions under real concurrent load,
+              clean-checkout runs, chasing down query-planner behavior instead of trusting the
+              first benchmark number.
+            </li>
+            <li>
+              Backend: FastAPI/Flask APIs, PostgreSQL. AI: LLM-powered features, Anthropic/OpenAI
+              SDKs. MCP: building servers and tools that let models act on real systems. Full-stack:
+              React + TypeScript. Infra: Docker, AWS (EKS, multi-tier deployments). Also comfortable
+              in C++.
+            </li>
+            <li>
+              Software engineering student at Friedrich-Alexander-Universit&auml;t
+              Erlangen-N&uuml;rnberg, currently exploring internship / working student
+              opportunities.
+            </li>
+          </ul>
         </div>
       </Section>
 
