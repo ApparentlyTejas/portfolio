@@ -1,15 +1,14 @@
 :root {
-  --bg: #0a0a0b;
-  --bg2: #111113;
-  --bg3: #18181b;
-  --surface: #141416;
-  --surface-border: #28282c;
-  --text: #f5f5f6;
-  --text-dim: #a3a3a8;
-  --text-dimmer: #6c6c72;
-  --accent-blue: #d6d9de;
-  --accent-purple: #9a9aa2;
-  --accent-green: #4fb97a;
+  --bg: #05070a;
+  --bg2: #0a0d13;
+  --bg3: #10141c;
+  --surface: #0d1017;
+  --surface-border: #1e2430;
+  --text: #f2f4f8;
+  --text-dim: #9ba3b2;
+  --text-dimmer: #5b6372;
+  --accent-blue: #5b7cff;
+  --accent-orange: #ffa62b;
   --mono: 'IBM Plex Mono', Consolas, monospace;
   --sans: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
   --display: 'Space Grotesk', var(--sans);
@@ -38,5 +37,5 @@ a {
 
 ::selection {
   background: var(--accent-blue);
-  color: #0b0b0d;
+  color: var(--bg);
 }

@@ -19,7 +19,7 @@ Home (hero + 3D orb)
   +-- Contact      ($ contact --open)         email, GitHub, LinkedIn
 ```
 
-Section headers use a `$ command --flag` convention (e.g. `$ projects --selected`), carrying the terminal aesthetic (IBM Plex Mono, dark background, muted greys) through every part of the page, not just the hero.
+Section headers use a `$ command --flag` convention (e.g. `$ projects --selected`), carrying the terminal aesthetic (IBM Plex Mono, midnight-black background, electric blue and cantaloupe orange accents) through every part of the page, not just the hero.
 
 ## Built with
 
@@ -42,7 +42,7 @@ On top of that it is genuinely interactive, not just decorative:
 - Pointer-driven rotation: the orb's Y and X rotation track `pointer.x` / `pointer.y` from `useFrame`, so it tilts toward the cursor in real time.
 - Scroll-linked camera dolly: as you scroll past the hero, `camera.position.z` and `camera.position.y` are interpolated from `window.scrollY`, pulling the camera back and down so the orb recedes as the page scrolls, instead of just scrolling off screen.
 - A gentle idle float (drei's `Float`) layered on top so the orb is never fully still, even without input.
-- Three directional lights plus a point light at carefully tuned intensities and cool greys, so the distort material reads as brushed metal instead of flat plastic.
+- Three directional lights plus a point light at carefully tuned intensities, with a warm orange rim light and a cool blue backlight picking up the site's own accent colors, so the distort material reads as brushed metal instead of flat plastic.
 - Responsive device pixel ratio capping (`dpr={isSmall ? [1, 1.2] : [1, 1.6]}`) and `powerPreference: 'low-power'` to keep it smooth on laptops and phones rather than maxing out the GPU.
 
 The rest of the page leans on framer-motion: the hero title animates in character by character with a staggered delay and a slight rotateX "flip up," and every section's badges, tags, and call-to-action buttons fade and slide in on load with a shared custom easing curve.

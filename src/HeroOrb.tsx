@@ -43,10 +43,10 @@ export default function HeroOrb() {
       gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
       style={{ position: 'absolute', inset: 0 }}
     >
-      <ambientLight intensity={0.5} color="#3a3a3e" />
+      <ambientLight intensity={0.5} color="#1a2440" />
       <directionalLight position={[4, 5, 4]} intensity={3.4} color="#ffffff" />
-      <directionalLight position={[-5, 1, 2]} intensity={1.6} color="#c8ccd2" />
-      <directionalLight position={[-2, -3, -5]} intensity={2.2} color="#ffffff" />
+      <directionalLight position={[-5, 1, 2]} intensity={1.6} color="#ffb04d" />
+      <directionalLight position={[-2, -3, -5]} intensity={2.2} color="#5b7cff" />
       <pointLight position={[0, 1, 5]} intensity={1} color="#ffffff" />
       <Orb />
     </Canvas>
