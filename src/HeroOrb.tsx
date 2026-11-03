@@ -22,7 +22,7 @@ function Orb() {
       <mesh ref={mesh} scale={1.5}>
         <icosahedronGeometry args={[1, 32]} />
         <MeshDistortMaterial
-          color="#e4e6ea"
+          color="#6d7fd4"
           roughness={0.16}
           metalness={0.55}
           distort={0.38}
