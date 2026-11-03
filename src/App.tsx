@@ -1,6 +1,6 @@
-import { Suspense, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
-import HeroOrb from './HeroOrb'
+import Scene3D from './Scene3D'
 import './App.css'
 
 const NAV_LINKS = [
@@ -165,6 +165,9 @@ function App() {
 
   return (
     <>
+      <Scene3D />
+
+      <div className="page-content">
       <header className="navbar">
         <a href="#home" className="brand">tejas malhotra</a>
         <nav className="nav-desktop">
@@ -194,11 +197,6 @@ function App() {
       )}
 
       <section id="home" className="hero-section">
-        <div className="hero-canvas">
-          <Suspense fallback={null}>
-            <HeroOrb />
-          </Suspense>
-        </div>
         <div className="hero-fade" />
         <div className="hero">
           <motion.span
@@ -413,6 +411,7 @@ function App() {
         <span>built with React + Vite + TypeScript</span>
         <span>&copy; {new Date().getFullYear()} Tejas Malhotra</span>
       </footer>
+      </div>
     </>
   )
 }
