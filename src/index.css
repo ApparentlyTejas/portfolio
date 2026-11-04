@@ -1,5 +1,6 @@
 :root {
   --bg: #05070a;
+  --bg-rgb: 5, 7, 10;
   --bg2: #0a0d13;
   --bg3: #10141c;
   --surface: #0d1017;
@@ -9,9 +10,28 @@
   --text-dimmer: #5b6372;
   --accent-blue: #5b7cff;
   --accent-orange: #ffa62b;
+  /* AA-safe variants for accent-as-text usage; equal to the vivid accents
+     on dark backgrounds, darkened for light backgrounds (see below) */
+  --accent-blue-ink: #5b7cff;
+  --accent-orange-ink: #ffa62b;
+  --ink: #05070a;
   --mono: 'IBM Plex Mono', Consolas, monospace;
   --sans: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
   --display: 'Space Grotesk', var(--sans);
+}
+
+:root[data-theme='light'] {
+  --bg: #f7f8fb;
+  --bg-rgb: 247, 248, 251;
+  --bg2: #eef0f6;
+  --bg3: #e4e7f0;
+  --surface: #ffffff;
+  --surface-border: #dde1ea;
+  --text: #0d1017;
+  --text-dim: #4b5262;
+  --text-dimmer: #6b7280;
+  --accent-blue-ink: #3658e0;
+  --accent-orange-ink: #a85a0d;
 }
 
 * {
@@ -28,6 +48,7 @@ body {
   color: var(--text);
   font-family: var(--sans);
   -webkit-font-smoothing: antialiased;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -37,5 +58,5 @@ a {
 
 ::selection {
   background: var(--accent-blue);
-  color: var(--bg);
+  color: var(--ink);
 }
