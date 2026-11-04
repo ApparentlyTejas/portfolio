@@ -214,7 +214,7 @@ function ContactStop() {
   )
 }
 
-export default function Scene3D() {
+export default function Scene3D({ theme }: { theme: 'dark' | 'light' }) {
   const isSmall = typeof window !== 'undefined' && window.innerWidth < 720
 
   return (
@@ -224,7 +224,7 @@ export default function Scene3D() {
         dpr={isSmall ? [1, 1.2] : [1, 1.6]}
         gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
       >
-        <ambientLight intensity={0.5} color="#1a2440" />
+        <ambientLight intensity={theme === 'light' ? 0.85 : 0.5} color={theme === 'light' ? '#e8ecff' : '#1a2440'} />
         <directionalLight position={[4, 5, 4]} intensity={3.4} color="#ffffff" />
         <directionalLight position={[-5, 1, 2]} intensity={1.6} color="#ffb04d" />
         <directionalLight position={[-2, -3, -5]} intensity={2.2} color="#5b7cff" />
