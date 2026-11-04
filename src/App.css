@@ -6,7 +6,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px clamp(20px, 5vw, 64px);
-  background: rgba(5, 7, 10, 0.75);
+  background: rgba(var(--bg-rgb), 0.75);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--surface-border);
 }
@@ -30,7 +30,31 @@
 }
 
 .nav-desktop a:hover {
-  color: var(--accent-blue);
+  color: var(--accent-blue-ink);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--surface-border);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  margin-left: clamp(8px, 1.5vw, 20px);
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent-blue-ink);
+  color: var(--accent-blue-ink);
+}
+
+.theme-toggle svg {
+  width: 17px;
+  height: 17px;
 }
 
 .menu-btn {
@@ -69,7 +93,7 @@
   position: sticky;
   top: 61px;
   z-index: 49;
-  background: rgba(5, 7, 10, 0.97);
+  background: rgba(var(--bg-rgb), 0.97);
   border-bottom: 1px solid var(--surface-border);
   padding: 8px clamp(20px, 5vw, 64px) 18px;
 }
@@ -102,7 +126,7 @@ h3 {
 .command-header {
   font-family: var(--mono);
   font-size: clamp(18px, 2.4vw, 24px);
-  color: var(--accent-orange);
+  color: var(--accent-orange-ink);
   margin: 0 0 36px;
   letter-spacing: 0.5px;
 }
@@ -132,7 +156,7 @@ h3 {
 .hero-fade {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 70% 60% at 50% 42%, rgba(5, 7, 10, 0.55) 0%, rgba(5, 7, 10, 0.3) 45%, transparent 72%);
+  background: radial-gradient(ellipse 70% 60% at 50% 42%, rgba(var(--bg-rgb), 0.55) 0%, rgba(var(--bg-rgb), 0.3) 45%, transparent 72%);
   pointer-events: none;
 }
 
@@ -150,6 +174,14 @@ h3 {
 
 .hero-sub {
   text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+:root[data-theme='light'] .hero-title {
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.65), 0 6px 40px rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme='light'] .hero-sub {
+  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.75);
 }
 
 .badge {
@@ -206,7 +238,7 @@ h3 {
 .tag {
   font-family: var(--mono);
   font-size: 12.5px;
-  color: var(--accent-blue);
+  color: var(--accent-blue-ink);
   background: rgba(91, 124, 255, 0.1);
   border: 1px solid rgba(91, 124, 255, 0.25);
   padding: 5px 12px;
@@ -237,7 +269,7 @@ h3 {
 
 .btn-primary {
   background: linear-gradient(90deg, var(--accent-blue), var(--accent-orange));
-  color: var(--bg);
+  color: var(--ink);
   font-weight: 600;
   border: none;
 }
@@ -252,8 +284,8 @@ h3 {
 }
 
 .btn-ghost:hover {
-  border-color: var(--accent-blue);
-  color: var(--accent-blue);
+  border-color: var(--accent-blue-ink);
+  color: var(--accent-blue-ink);
 }
 
 /* About */
@@ -335,7 +367,7 @@ h3 {
 }
 
 .skill-count {
-  color: var(--accent-orange);
+  color: var(--accent-orange-ink);
   background: rgba(255, 166, 43, 0.12);
   border-radius: 999px;
   padding: 2px 9px;
@@ -361,7 +393,7 @@ h3 {
   content: '\2192';
   position: absolute;
   left: 0;
-  color: var(--accent-blue);
+  color: var(--accent-blue-ink);
 }
 
 /* Projects */
@@ -395,7 +427,7 @@ h3 {
 }
 
 .project-category {
-  color: var(--accent-orange);
+  color: var(--accent-orange-ink);
   background: rgba(255, 166, 43, 0.1);
   padding: 3px 10px;
   border-radius: 999px;
@@ -434,7 +466,7 @@ h3 {
   content: '\2022';
   position: absolute;
   left: 0;
-  color: var(--accent-orange);
+  color: var(--accent-orange-ink);
 }
 
 .project-links {
@@ -447,7 +479,7 @@ h3 {
 }
 
 .project-links a {
-  color: var(--accent-blue);
+  color: var(--accent-blue-ink);
 }
 
 .project-links a:hover {
@@ -488,7 +520,7 @@ h3 {
 .timeline-dates {
   font-family: var(--mono);
   font-size: 12.5px;
-  color: var(--accent-orange);
+  color: var(--accent-orange-ink);
   white-space: nowrap;
 }
 
@@ -512,7 +544,7 @@ h3 {
   content: '\2022';
   position: absolute;
   left: 0;
-  color: var(--accent-blue);
+  color: var(--accent-blue-ink);
 }
 
 /* Contact */
@@ -568,12 +600,12 @@ h3 {
 }
 
 .contact-links a {
-  color: var(--accent-blue);
+  color: var(--accent-blue-ink);
   border-bottom: 1px solid transparent;
 }
 
 .contact-links a:hover {
-  border-color: var(--accent-blue);
+  border-color: var(--accent-blue-ink);
 }
 
 /* Footer */
