@@ -8,6 +8,15 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#05070a" />
+    <script>
+      (function () {
+        try {
+          if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.setAttribute('data-theme', 'light')
+          }
+        } catch (e) {}
+      })()
+    </script>
     <meta name="description" content="Tejas Malhotra — Software Engineer, backend, distributed systems, AI & MCP tooling." />
     <title>Tejas Malhotra</title>
   </head>
