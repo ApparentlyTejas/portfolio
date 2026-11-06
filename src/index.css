@@ -7,7 +7,7 @@
   --surface-border: #1e2430;
   --text: #f2f4f8;
   --text-dim: #9ba3b2;
-  --text-dimmer: #5b6372;
+  --text-dimmer: #7c8494;
   --accent-blue: #5b7cff;
   --accent-orange: #ffa62b;
   /* AA-safe variants for accent-as-text usage; equal to the vivid accents
@@ -29,7 +29,7 @@
   --surface-border: #dde1ea;
   --text: #0d1017;
   --text-dim: #4b5262;
-  --text-dimmer: #6b7280;
+  --text-dimmer: #5f6675;
   --accent-blue-ink: #3658e0;
   --accent-orange-ink: #a85a0d;
 }
