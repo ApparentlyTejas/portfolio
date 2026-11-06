@@ -383,7 +383,7 @@ h3 {
 }
 
 .skill-card li {
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--text-dim);
   padding-left: 14px;
   position: relative;
@@ -455,7 +455,7 @@ h3 {
 }
 
 .project-bullets li {
-  font-size: 13px;
+  font-size: 13.5px;
   color: var(--text-dim);
   padding-left: 14px;
   position: relative;
@@ -514,7 +514,7 @@ h3 {
 .timeline-sub {
   margin: 0;
   color: var(--text-dim);
-  font-size: 13.5px;
+  font-size: 14px;
 }
 
 .timeline-dates {
@@ -533,7 +533,7 @@ h3 {
 }
 
 .timeline-card li {
-  font-size: 13.5px;
+  font-size: 14px;
   color: var(--text-dim);
   padding-left: 14px;
   position: relative;
