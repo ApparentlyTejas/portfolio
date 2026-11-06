@@ -156,7 +156,7 @@ h3 {
 .hero-fade {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse 70% 60% at 50% 42%, rgba(var(--bg-rgb), 0.55) 0%, rgba(var(--bg-rgb), 0.3) 45%, transparent 72%);
+  background: radial-gradient(ellipse 80% 70% at 50% 46%, rgba(var(--bg-rgb), 0.75) 0%, rgba(var(--bg-rgb), 0.5) 40%, rgba(var(--bg-rgb), 0.18) 65%, transparent 85%);
   pointer-events: none;
 }
 
@@ -166,27 +166,22 @@ h3 {
   max-width: 820px;
   margin: 0 auto;
   text-align: center;
-  padding: 40px 48px;
-  border-radius: 24px;
-  background: rgba(var(--bg-rgb), 0.55);
-  backdrop-filter: blur(16px);
-  border: 1px solid var(--surface-border);
 }
 
 .hero-title {
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.75), 0 6px 40px rgba(0, 0, 0, 0.6);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 6px 44px rgba(0, 0, 0, 0.7);
 }
 
 .hero-sub {
-  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.9), 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 
 :root[data-theme='light'] .hero-title {
-  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.65), 0 6px 40px rgba(255, 255, 255, 0.5);
+  text-shadow: 0 2px 12px rgba(255, 255, 255, 0.75), 0 6px 44px rgba(255, 255, 255, 0.6);
 }
 
 :root[data-theme='light'] .hero-sub {
-  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.75);
+  text-shadow: 0 2px 16px rgba(255, 255, 255, 0.85), 0 1px 4px rgba(255, 255, 255, 0.85);
 }
 
 .badge {
