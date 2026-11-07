@@ -446,9 +446,11 @@ function App() {
       </Section>
 
       <footer className="footer">
-        <span>tejasmalhotra.dev</span>
-        <span>built with React + Vite + TypeScript</span>
-        <span>&copy; {new Date().getFullYear()} Tejas Malhotra</span>
+        <span>&copy; {new Date().getFullYear()} Tejas Malhotra. All rights reserved.</span>
+        <div className="footer-links">
+          <a href="https://github.com/ApparentlyTejas" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="https://www.linkedin.com/in/tejasmalhotra410850207" target="_blank" rel="noreferrer">LinkedIn</a>
+        </div>
       </footer>
       </div>
     </>
