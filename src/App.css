@@ -296,7 +296,10 @@ h3 {
 .about-grid {
   display: grid;
   gap: 18px;
-  max-width: 820px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 16px;
+  padding: 30px 34px;
 }
 
 .about-grid p {
@@ -304,6 +307,7 @@ h3 {
   line-height: 1.7;
   margin: 0;
   font-size: 15.5px;
+  max-width: 820px;
 }
 
 .about-list {
@@ -320,6 +324,7 @@ h3 {
   font-size: 15.5px;
   padding-left: 20px;
   position: relative;
+  max-width: 820px;
 }
 
 .about-list li::before {
