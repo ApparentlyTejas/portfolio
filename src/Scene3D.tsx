@@ -46,7 +46,7 @@ function useReveal(stopZ: number, falloff = 7) {
   return ref
 }
 
-function HomeStop() {
+function HomeStop({ theme }: { theme: 'dark' | 'light' }) {
   const groupRef = useReveal(STOPS.home)
   const meshRef = useRef<THREE.Mesh>(null)
   useFrame(({ clock, pointer }) => {
@@ -61,7 +61,13 @@ function HomeStop() {
       <Float speed={1} rotationIntensity={0.15} floatIntensity={0.55}>
         <mesh ref={meshRef} scale={1.5}>
           <icosahedronGeometry args={[1, 32]} />
-          <MeshDistortMaterial color="#6d7fd4" roughness={0.16} metalness={0.55} distort={0.38} speed={1.3} />
+          <MeshDistortMaterial
+            color={theme === 'light' ? '#4a5bb8' : '#6d7fd4'}
+            roughness={theme === 'light' ? 0.42 : 0.16}
+            metalness={theme === 'light' ? 0.2 : 0.55}
+            distort={0.38}
+            speed={1.3}
+          />
         </mesh>
       </Float>
     </group>
@@ -224,13 +230,13 @@ export default function Scene3D({ theme }: { theme: 'dark' | 'light' }) {
         dpr={isSmall ? [1, 1.2] : [1, 1.6]}
         gl={{ antialias: true, alpha: true, powerPreference: 'low-power' }}
       >
-        <ambientLight intensity={theme === 'light' ? 0.85 : 0.5} color={theme === 'light' ? '#e8ecff' : '#1a2440'} />
-        <directionalLight position={[4, 5, 4]} intensity={3.4} color="#ffffff" />
-        <directionalLight position={[-5, 1, 2]} intensity={1.6} color="#ffb04d" />
-        <directionalLight position={[-2, -3, -5]} intensity={2.2} color="#5b7cff" />
-        <pointLight position={[0, 1, 5]} intensity={1} color="#ffffff" />
+        <ambientLight intensity={theme === 'light' ? 0.55 : 0.5} color={theme === 'light' ? '#ffffff' : '#1a2440'} />
+        <directionalLight position={[4, 5, 4]} intensity={theme === 'light' ? 1.7 : 3.4} color="#ffffff" />
+        <directionalLight position={[-5, 1, 2]} intensity={theme === 'light' ? 0.8 : 1.6} color="#ffb04d" />
+        <directionalLight position={[-2, -3, -5]} intensity={theme === 'light' ? 1.1 : 2.2} color="#5b7cff" />
+        <pointLight position={[0, 1, 5]} intensity={theme === 'light' ? 0.5 : 1} color="#ffffff" />
         <CameraRig />
-        <HomeStop />
+        <HomeStop theme={theme} />
         <AboutStop />
         <SkillsStop />
         <ProjectsStop />
