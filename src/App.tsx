@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, MotionConfig, useReducedMotion } from 'framer-motion'
 import Scene3D from './Scene3D'
 import './App.css'
 
 const NAV_LINKS = [
   { href: '#home', label: 'Home' },
-  { href: '#projects', label: 'Projects' },
   { href: '#skills', label: 'Skills' },
+  { href: '#projects', label: 'Projects' },
   { href: '#experience', label: 'Experience' },
   { href: '#education', label: 'Education' },
   { href: '#contact', label: 'Contact' },
@@ -42,7 +42,6 @@ const SKILLS = [
 
 const PROJECTS = [
   {
-    id: '01',
     category: 'mcp / backend',
     title: 'Incident Lens',
     desc: 'Role-aware, evidence-backed MCP server over BGL and OpenStack logs in SereneDB. Every answer traces back to a real query, with a hash-chained tamper-evident evidence ledger and row-level security per team.',
@@ -56,7 +55,6 @@ const PROJECTS = [
     github: 'https://github.com/ApparentlyTejas/incident-lens',
   },
   {
-    id: '02',
     category: 'backend / systems',
     title: 'RoomLock',
     desc: 'Concurrency-safe booking API. Found and reproduced a real double-booking race condition under concurrent load, then eliminated it two different ways and load-tested both.',
@@ -71,7 +69,6 @@ const PROJECTS = [
     demo: 'https://bookingapi-i4cg.onrender.com/',
   },
   {
-    id: '03',
     category: 'ai / full-stack',
     title: 'ReviewLenzAI',
     desc: 'AI-powered GitHub PR review tool. Fetches a PR diff, sends it to an LLM with a structured tool-call schema, and returns typed, severity-ranked findings instead of free-form text.',
@@ -86,7 +83,6 @@ const PROJECTS = [
     demo: 'https://reviewlenzai.vercel.app',
   },
   {
-    id: '04',
     category: 'ai / mcp',
     title: 'DevPulse',
     desc: 'AI-powered engineering-ops platform for service monitoring, metrics, and incident management, exposed to Claude via MCP so an agent can investigate ops state directly.',
@@ -155,6 +151,46 @@ function CommandHeader({ children }: { children: string }) {
 
 const EASE = [0.16, 1, 0.3, 1] as const
 
+function Reveal({ className, children }: { className: string; children: React.ReactNode }) {
+  const reduceMotion = useReducedMotion()
+  return (
+    <motion.div
+      className={className}
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+}
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+}
+
+function StaggerGrid({ className, children }: { className: string; children: React.ReactNode }) {
+  const reduceMotion = useReducedMotion()
+  return (
+    <motion.div
+      className={className}
+      initial={reduceMotion ? false : 'hidden'}
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
+      variants={staggerContainer}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 type Theme = 'dark' | 'light'
 
 function getInitialTheme(): Theme {
@@ -187,9 +223,24 @@ function App() {
   const [booted, setBooted] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const [activeSection, setActiveSection] = useState('home')
   useEffect(() => {
     const id = requestAnimationFrame(() => setBooted(true))
     return () => cancelAnimationFrame(id)
+  }, [])
+
+  useEffect(() => {
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('section[id]'))
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id)
+        })
+      },
+      { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+    )
+    sections.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -202,7 +253,7 @@ function App() {
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <Scene3D theme={theme} />
 
       <div className="page-content">
@@ -210,7 +261,16 @@ function App() {
         <a href="#home" className="brand">tejas malhotra</a>
         <nav className="nav-desktop">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href}>{l.label}</a>
+            <a key={l.href} href={l.href} className={activeSection === l.href.slice(1) ? 'active' : ''}>
+              {l.label}
+              {activeSection === l.href.slice(1) && (
+                <motion.span
+                  className="nav-underline"
+                  layoutId="nav-underline"
+                  transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                />
+              )}
+            </a>
           ))}
         </nav>
         <ThemeToggle theme={theme} onToggle={toggleTheme} />
@@ -228,7 +288,12 @@ function App() {
       {menuOpen && (
         <nav className="nav-mobile">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}>
+            <a
+              key={l.href}
+              href={l.href}
+              className={activeSection === l.href.slice(1) ? 'active' : ''}
+              onClick={() => setMenuOpen(false)}
+            >
               {l.label}
             </a>
           ))}
@@ -298,11 +363,12 @@ function App() {
 
       <Section id="about">
         <CommandHeader>$ about --me</CommandHeader>
-        <div className="about-grid">
+        <Reveal className="about-grid">
           <p>
-            I build across the stack: backend APIs, full-stack web apps, AI features, and MCP
-            tooling. I lean toward projects that get tested against real conditions, not just
-            demoed once and shipped.
+            Most of what's below started as a question I wanted answered for real: does this
+            lock actually stop two people booking the same room, does this query still hold up
+            against a billion rows, does this review tool survive past a single demo. I'd
+            rather spend the extra time proving an answer than assume one.
           </p>
           <ul className="about-list">
             <li>
@@ -322,14 +388,14 @@ function App() {
               opportunities.
             </li>
           </ul>
-        </div>
+        </Reveal>
       </Section>
 
       <Section id="skills">
         <CommandHeader>$ skills --stack</CommandHeader>
-        <div className="skills-grid">
+        <StaggerGrid className="skills-grid">
           {SKILLS.map((s) => (
-            <div className="skill-card" key={s.label}>
+            <motion.div className="skill-card" key={s.label} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="skill-card-head">
                 <span>{s.label}</span>
                 <span className="skill-count">{s.count}</span>
@@ -339,16 +405,16 @@ function App() {
                   <li key={i}>{i}</li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </StaggerGrid>
       </Section>
 
       <Section id="projects">
         <CommandHeader>$ projects --selected</CommandHeader>
-        <div className="projects-grid">
+        <StaggerGrid className="projects-grid">
           {PROJECTS.map((p) => (
-            <div className="project-card" key={p.id}>
+            <motion.div className="project-card" key={p.title} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="project-head">
                 <span className="project-category">{p.category}</span>
               </div>
@@ -370,16 +436,16 @@ function App() {
                   <a href={p.demo} target="_blank" rel="noreferrer">Live Demo &rarr;</a>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </StaggerGrid>
       </Section>
 
       <Section id="experience">
         <CommandHeader>$ experience --all</CommandHeader>
-        <div className="timeline">
+        <StaggerGrid className="timeline">
           {EXPERIENCE.map((e) => (
-            <div className="timeline-card" key={e.role + e.company}>
+            <motion.div className="timeline-card" key={e.role + e.company} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.role}</h3>
@@ -397,16 +463,16 @@ function App() {
                   <span className="tag tag-sm" key={t}>{t}</span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </StaggerGrid>
       </Section>
 
       <Section id="education">
         <CommandHeader>$ education --history</CommandHeader>
-        <div className="timeline">
+        <StaggerGrid className="timeline">
           {EDUCATION.map((e) => (
-            <div className="timeline-card" key={e.degree}>
+            <motion.div className="timeline-card" key={e.degree} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.degree}</h3>
@@ -419,14 +485,14 @@ function App() {
                   <li key={b}>{b}</li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </StaggerGrid>
       </Section>
 
       <Section id="contact">
         <CommandHeader>$ contact --open</CommandHeader>
-        <div className="contact-box">
+        <Reveal className="contact-box">
           <h3>Let's build something real.</h3>
           <p>
             Open to internship and working student roles in backend, distributed systems,
@@ -442,7 +508,7 @@ function App() {
             <a href="https://github.com/ApparentlyTejas" target="_blank" rel="noreferrer">GitHub</a>
             <a href="https://www.linkedin.com/in/tejasmalhotra410850207" target="_blank" rel="noreferrer">LinkedIn</a>
           </div>
-        </div>
+        </Reveal>
       </Section>
 
       <footer className="footer">
@@ -453,7 +519,7 @@ function App() {
         </div>
       </footer>
       </div>
-    </>
+    </MotionConfig>
   )
 }
 
