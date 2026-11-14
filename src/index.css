@@ -60,3 +60,14 @@ a {
   background: var(--accent-blue);
   color: var(--ink);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .btn:hover,
+  .btn:active {
+    transform: none;
+  }
+}

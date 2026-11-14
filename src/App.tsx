@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, MotionConfig, useReducedMotion } from 'framer-motion'
 import Scene3D from './Scene3D'
 import './App.css'
 
@@ -253,7 +253,7 @@ function App() {
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <Scene3D theme={theme} />
 
       <div className="page-content">
@@ -395,7 +395,7 @@ function App() {
         <CommandHeader>$ skills --stack</CommandHeader>
         <StaggerGrid className="skills-grid">
           {SKILLS.map((s) => (
-            <motion.div className="skill-card" key={s.label} variants={staggerItem}>
+            <motion.div className="skill-card" key={s.label} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="skill-card-head">
                 <span>{s.label}</span>
                 <span className="skill-count">{s.count}</span>
@@ -414,7 +414,7 @@ function App() {
         <CommandHeader>$ projects --selected</CommandHeader>
         <StaggerGrid className="projects-grid">
           {PROJECTS.map((p) => (
-            <motion.div className="project-card" key={p.title} variants={staggerItem}>
+            <motion.div className="project-card" key={p.title} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="project-head">
                 <span className="project-category">{p.category}</span>
               </div>
@@ -445,7 +445,7 @@ function App() {
         <CommandHeader>$ experience --all</CommandHeader>
         <StaggerGrid className="timeline">
           {EXPERIENCE.map((e) => (
-            <motion.div className="timeline-card" key={e.role + e.company} variants={staggerItem}>
+            <motion.div className="timeline-card" key={e.role + e.company} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.role}</h3>
@@ -472,7 +472,7 @@ function App() {
         <CommandHeader>$ education --history</CommandHeader>
         <StaggerGrid className="timeline">
           {EDUCATION.map((e) => (
-            <motion.div className="timeline-card" key={e.degree} variants={staggerItem}>
+            <motion.div className="timeline-card" key={e.degree} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.degree}</h3>
@@ -519,7 +519,7 @@ function App() {
         </div>
       </footer>
       </div>
-    </>
+    </MotionConfig>
   )
 }
 
