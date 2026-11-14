@@ -436,10 +436,6 @@ h3 {
   font-size: 12px;
 }
 
-.project-id {
-  color: var(--text-dimmer);
-}
-
 .project-category {
   color: var(--accent-orange-ink);
   background: rgba(255, 166, 43, 0.1);
@@ -649,6 +645,24 @@ h3 {
 .footer-links a:hover {
   color: var(--accent-blue-ink);
   border-color: var(--accent-blue-ink);
+}
+
+/* Keyboard focus */
+.btn:focus-visible,
+.nav-desktop a:focus-visible,
+.nav-mobile a:focus-visible,
+.theme-toggle:focus-visible,
+.project-links a:focus-visible,
+.contact-links a:focus-visible,
+.footer-links a:focus-visible {
+  outline: 2px solid var(--accent-blue-ink);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.btn:focus-visible,
+.theme-toggle:focus-visible {
+  border-radius: 10px;
 }
 
 @media (max-width: 720px) {

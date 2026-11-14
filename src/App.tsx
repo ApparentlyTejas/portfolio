@@ -42,7 +42,6 @@ const SKILLS = [
 
 const PROJECTS = [
   {
-    id: '01',
     category: 'mcp / backend',
     title: 'Incident Lens',
     desc: 'Role-aware, evidence-backed MCP server over BGL and OpenStack logs in SereneDB. Every answer traces back to a real query, with a hash-chained tamper-evident evidence ledger and row-level security per team.',
@@ -56,7 +55,6 @@ const PROJECTS = [
     github: 'https://github.com/ApparentlyTejas/incident-lens',
   },
   {
-    id: '02',
     category: 'backend / systems',
     title: 'RoomLock',
     desc: 'Concurrency-safe booking API. Found and reproduced a real double-booking race condition under concurrent load, then eliminated it two different ways and load-tested both.',
@@ -71,7 +69,6 @@ const PROJECTS = [
     demo: 'https://bookingapi-i4cg.onrender.com/',
   },
   {
-    id: '03',
     category: 'ai / full-stack',
     title: 'ReviewLenzAI',
     desc: 'AI-powered GitHub PR review tool. Fetches a PR diff, sends it to an LLM with a structured tool-call schema, and returns typed, severity-ranked findings instead of free-form text.',
@@ -86,7 +83,6 @@ const PROJECTS = [
     demo: 'https://reviewlenzai.vercel.app',
   },
   {
-    id: '04',
     category: 'ai / mcp',
     title: 'DevPulse',
     desc: 'AI-powered engineering-ops platform for service monitoring, metrics, and incident management, exposed to Claude via MCP so an agent can investigate ops state directly.',
@@ -339,9 +335,10 @@ function App() {
         <CommandHeader>$ about --me</CommandHeader>
         <Reveal className="about-grid">
           <p>
-            I build across the stack: backend APIs, full-stack web apps, AI features, and MCP
-            tooling. I lean toward projects that get tested against real conditions, not just
-            demoed once and shipped.
+            Most of what's below started as a question I wanted answered for real: does this
+            lock actually stop two people booking the same room, does this query still hold up
+            against a billion rows, does this review tool survive past a single demo. I'd
+            rather spend the extra time proving an answer than assume one.
           </p>
           <ul className="about-list">
             <li>
@@ -387,7 +384,7 @@ function App() {
         <CommandHeader>$ projects --selected</CommandHeader>
         <Reveal className="projects-grid">
           {PROJECTS.map((p) => (
-            <div className="project-card" key={p.id}>
+            <div className="project-card" key={p.title}>
               <div className="project-head">
                 <span className="project-category">{p.category}</span>
               </div>
