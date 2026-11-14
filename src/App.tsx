@@ -187,9 +187,26 @@ function App() {
   const [booted, setBooted] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
+  const [activeSection, setActiveSection] = useState('home')
   useEffect(() => {
     const id = requestAnimationFrame(() => setBooted(true))
     return () => cancelAnimationFrame(id)
+  }, [])
+
+  useEffect(() => {
+    const sections = NAV_LINKS.map((l) => document.getElementById(l.href.slice(1))).filter(
+      (el): el is HTMLElement => el !== null
+    )
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActiveSection(entry.target.id)
+        })
+      },
+      { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
+    )
+    sections.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -210,7 +227,9 @@ function App() {
         <a href="#home" className="brand">tejas malhotra</a>
         <nav className="nav-desktop">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href}>{l.label}</a>
+            <a key={l.href} href={l.href} className={activeSection === l.href.slice(1) ? 'active' : ''}>
+              {l.label}
+            </a>
           ))}
         </nav>
         <ThemeToggle theme={theme} onToggle={toggleTheme} />
@@ -228,7 +247,12 @@ function App() {
       {menuOpen && (
         <nav className="nav-mobile">
           {NAV_LINKS.map((l) => (
-            <a key={l.href} href={l.href} onClick={() => setMenuOpen(false)}>
+            <a
+              key={l.href}
+              href={l.href}
+              className={activeSection === l.href.slice(1) ? 'active' : ''}
+              onClick={() => setMenuOpen(false)}
+            >
               {l.label}
             </a>
           ))}

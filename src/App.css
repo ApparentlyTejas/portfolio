@@ -29,7 +29,8 @@
   transition: color 0.15s ease;
 }
 
-.nav-desktop a:hover {
+.nav-desktop a:hover,
+.nav-desktop a.active {
   color: var(--accent-blue-ink);
 }
 
@@ -103,6 +104,10 @@
   font-size: 15px;
   color: var(--text-dim);
   border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.nav-mobile a.active {
+  color: var(--accent-blue-ink);
 }
 
 .nav-mobile a:last-child {
