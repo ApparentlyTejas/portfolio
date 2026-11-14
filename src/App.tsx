@@ -263,6 +263,13 @@ function App() {
           {NAV_LINKS.map((l) => (
             <a key={l.href} href={l.href} className={activeSection === l.href.slice(1) ? 'active' : ''}>
               {l.label}
+              {activeSection === l.href.slice(1) && (
+                <motion.span
+                  className="nav-underline"
+                  layoutId="nav-underline"
+                  transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                />
+              )}
             </a>
           ))}
         </nav>
