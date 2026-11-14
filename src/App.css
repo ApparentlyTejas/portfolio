@@ -273,7 +273,15 @@ h3 {
   padding: 11px 22px;
   border-radius: 10px;
   border: 1px solid var(--surface-border);
-  transition: all 0.15s ease;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn-primary {
@@ -285,6 +293,7 @@ h3 {
 
 .btn-primary:hover {
   filter: brightness(1.08);
+  box-shadow: 0 10px 24px -10px rgba(91, 124, 255, 0.5);
 }
 
 .btn-ghost {
@@ -362,7 +371,20 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.25s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+.project-card:hover,
+.skill-card:hover,
+.timeline-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px -20px rgba(91, 124, 255, 0.35), 0 8px 20px -12px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-theme='light'] .project-card:hover,
+:root[data-theme='light'] .skill-card:hover,
+:root[data-theme='light'] .timeline-card:hover {
+  box-shadow: 0 16px 40px -20px rgba(91, 124, 255, 0.22), 0 8px 20px -12px rgba(16, 20, 28, 0.12);
 }
 
 .skill-card {
@@ -424,6 +446,7 @@ h3 {
 }
 
 .project-card:hover,
+.skill-card:hover,
 .timeline-card:hover {
   border-color: rgba(255, 166, 43, 0.45);
 }
