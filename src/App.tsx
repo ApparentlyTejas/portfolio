@@ -166,6 +166,31 @@ function Reveal({ className, children }: { className: string; children: React.Re
   )
 }
 
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+}
+
+const staggerItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
+}
+
+function StaggerGrid({ className, children }: { className: string; children: React.ReactNode }) {
+  const reduceMotion = useReducedMotion()
+  return (
+    <motion.div
+      className={className}
+      initial={reduceMotion ? false : 'hidden'}
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.15 }}
+      variants={staggerContainer}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 type Theme = 'dark' | 'light'
 
 function getInitialTheme(): Theme {
@@ -361,9 +386,9 @@ function App() {
 
       <Section id="skills">
         <CommandHeader>$ skills --stack</CommandHeader>
-        <Reveal className="skills-grid">
+        <StaggerGrid className="skills-grid">
           {SKILLS.map((s) => (
-            <div className="skill-card" key={s.label}>
+            <motion.div className="skill-card" key={s.label} variants={staggerItem}>
               <div className="skill-card-head">
                 <span>{s.label}</span>
                 <span className="skill-count">{s.count}</span>
@@ -373,16 +398,16 @@ function App() {
                   <li key={i}>{i}</li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           ))}
-        </Reveal>
+        </StaggerGrid>
       </Section>
 
       <Section id="projects">
         <CommandHeader>$ projects --selected</CommandHeader>
-        <Reveal className="projects-grid">
+        <StaggerGrid className="projects-grid">
           {PROJECTS.map((p) => (
-            <div className="project-card" key={p.title}>
+            <motion.div className="project-card" key={p.title} variants={staggerItem}>
               <div className="project-head">
                 <span className="project-category">{p.category}</span>
               </div>
@@ -404,16 +429,16 @@ function App() {
                   <a href={p.demo} target="_blank" rel="noreferrer">Live Demo &rarr;</a>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </Reveal>
+        </StaggerGrid>
       </Section>
 
       <Section id="experience">
         <CommandHeader>$ experience --all</CommandHeader>
-        <Reveal className="timeline">
+        <StaggerGrid className="timeline">
           {EXPERIENCE.map((e) => (
-            <div className="timeline-card" key={e.role + e.company}>
+            <motion.div className="timeline-card" key={e.role + e.company} variants={staggerItem}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.role}</h3>
@@ -431,16 +456,16 @@ function App() {
                   <span className="tag tag-sm" key={t}>{t}</span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </Reveal>
+        </StaggerGrid>
       </Section>
 
       <Section id="education">
         <CommandHeader>$ education --history</CommandHeader>
-        <Reveal className="timeline">
+        <StaggerGrid className="timeline">
           {EDUCATION.map((e) => (
-            <div className="timeline-card" key={e.degree}>
+            <motion.div className="timeline-card" key={e.degree} variants={staggerItem}>
               <div className="timeline-head">
                 <div>
                   <h3>{e.degree}</h3>
@@ -453,9 +478,9 @@ function App() {
                   <li key={b}>{b}</li>
                 ))}
               </ul>
-            </div>
+            </motion.div>
           ))}
-        </Reveal>
+        </StaggerGrid>
       </Section>
 
       <Section id="contact">
