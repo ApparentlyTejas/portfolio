@@ -5,8 +5,8 @@ import './App.css'
 
 const NAV_LINKS = [
   { href: '#home', label: 'Home' },
-  { href: '#projects', label: 'Projects' },
   { href: '#skills', label: 'Skills' },
+  { href: '#projects', label: 'Projects' },
   { href: '#experience', label: 'Experience' },
   { href: '#education', label: 'Education' },
   { href: '#contact', label: 'Contact' },
@@ -205,9 +205,7 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const sections = NAV_LINKS.map((l) => document.getElementById(l.href.slice(1))).filter(
-      (el): el is HTMLElement => el !== null
-    )
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('section[id]'))
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
