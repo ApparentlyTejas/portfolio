@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import Scene3D from './Scene3D'
 import './App.css'
 
@@ -154,6 +154,21 @@ function CommandHeader({ children }: { children: string }) {
 }
 
 const EASE = [0.16, 1, 0.3, 1] as const
+
+function Reveal({ className, children }: { className: string; children: React.ReactNode }) {
+  const reduceMotion = useReducedMotion()
+  return (
+    <motion.div
+      className={className}
+      initial={reduceMotion ? false : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.6, ease: EASE }}
+    >
+      {children}
+    </motion.div>
+  )
+}
 
 type Theme = 'dark' | 'light'
 
@@ -322,7 +337,7 @@ function App() {
 
       <Section id="about">
         <CommandHeader>$ about --me</CommandHeader>
-        <div className="about-grid">
+        <Reveal className="about-grid">
           <p>
             I build across the stack: backend APIs, full-stack web apps, AI features, and MCP
             tooling. I lean toward projects that get tested against real conditions, not just
@@ -346,12 +361,12 @@ function App() {
               opportunities.
             </li>
           </ul>
-        </div>
+        </Reveal>
       </Section>
 
       <Section id="skills">
         <CommandHeader>$ skills --stack</CommandHeader>
-        <div className="skills-grid">
+        <Reveal className="skills-grid">
           {SKILLS.map((s) => (
             <div className="skill-card" key={s.label}>
               <div className="skill-card-head">
@@ -365,12 +380,12 @@ function App() {
               </ul>
             </div>
           ))}
-        </div>
+        </Reveal>
       </Section>
 
       <Section id="projects">
         <CommandHeader>$ projects --selected</CommandHeader>
-        <div className="projects-grid">
+        <Reveal className="projects-grid">
           {PROJECTS.map((p) => (
             <div className="project-card" key={p.id}>
               <div className="project-head">
@@ -396,12 +411,12 @@ function App() {
               </div>
             </div>
           ))}
-        </div>
+        </Reveal>
       </Section>
 
       <Section id="experience">
         <CommandHeader>$ experience --all</CommandHeader>
-        <div className="timeline">
+        <Reveal className="timeline">
           {EXPERIENCE.map((e) => (
             <div className="timeline-card" key={e.role + e.company}>
               <div className="timeline-head">
@@ -423,12 +438,12 @@ function App() {
               </div>
             </div>
           ))}
-        </div>
+        </Reveal>
       </Section>
 
       <Section id="education">
         <CommandHeader>$ education --history</CommandHeader>
-        <div className="timeline">
+        <Reveal className="timeline">
           {EDUCATION.map((e) => (
             <div className="timeline-card" key={e.degree}>
               <div className="timeline-head">
@@ -445,12 +460,12 @@ function App() {
               </ul>
             </div>
           ))}
-        </div>
+        </Reveal>
       </Section>
 
       <Section id="contact">
         <CommandHeader>$ contact --open</CommandHeader>
-        <div className="contact-box">
+        <Reveal className="contact-box">
           <h3>Let's build something real.</h3>
           <p>
             Open to internship and working student roles in backend, distributed systems,
@@ -466,7 +481,7 @@ function App() {
             <a href="https://github.com/ApparentlyTejas" target="_blank" rel="noreferrer">GitHub</a>
             <a href="https://www.linkedin.com/in/tejasmalhotra410850207" target="_blank" rel="noreferrer">LinkedIn</a>
           </div>
-        </div>
+        </Reveal>
       </Section>
 
       <footer className="footer">
