@@ -38,29 +38,30 @@ function CameraRig() {
   return null
 }
 
-function useReveal(stopZ: number, falloff = 7) {
+function useReveal(stopZ: number, falloff = 4.5) {
   const ref = useRef<THREE.Group>(null)
   useFrame(({ camera }) => {
     if (!ref.current) return
     const targetCameraZ = stopZ + CAMERA_Z_START
     const dist = Math.abs(camera.position.z - targetCameraZ)
-    const focus = Math.max(0, 1 - dist / falloff)
-    ref.current.visible = focus > 0.02
+    const linear = Math.max(0, 1 - dist / falloff)
+    const focus = linear * linear
+    ref.current.visible = focus > 0.04
     ref.current.scale.setScalar(0.84 + focus * 0.16)
   })
   return ref
 }
 
 const TRANSMISSION_PROPS = {
-  resolution: 256,
+  resolution: 320,
   samples: 2,
   thickness: 0.6,
   roughness: 0.08,
-  chromaticAberration: 0.04,
-  anisotropy: 0.1,
-  envMapIntensity: 1.2,
+  chromaticAberration: 0.015,
+  anisotropy: 0.02,
+  envMapIntensity: 1,
   clearcoat: 1,
-  clearcoatRoughness: 0.1,
+  clearcoatRoughness: 0.15,
   ior: 1.4,
 }
 
@@ -98,10 +99,10 @@ function HomeStop({ theme }: { theme: 'dark' | 'light' }) {
         </mesh>
         <mesh ref={ringBRef} rotation={[0, 0, Math.PI / 3.2]}>
           <torusGeometry args={[2.5, 0.004, 8, 120]} />
-          <meshBasicMaterial color={GOLD} toneMapped={false} transparent opacity={0.6} />
+          <meshBasicMaterial color={GOLD} toneMapped={false} transparent opacity={0.45} />
         </mesh>
       </Float>
-      <Sparkles count={40} scale={6} size={1.4} speed={0.25} color={BLUE} opacity={0.5} />
+      <Sparkles count={26} scale={6} size={1.3} speed={0.25} color={BLUE} opacity={0.4} />
     </group>
   )
 }
@@ -155,18 +156,18 @@ function SkillsStop() {
   }, [nodes])
 
   return (
-    <group ref={groupRef} position={[0, 0, STOPS.skills]}>
+    <group ref={groupRef} position={[0, 0, STOPS.skills - 1.8]}>
       <group ref={clusterRef}>
         {edges.map(([a, b], i) => (
-          <Line key={i} points={[a, b]} color={i % 2 === 0 ? BLUE : GOLD} transparent opacity={0.22} lineWidth={1} />
+          <Line key={i} points={[a, b]} color={i % 2 === 0 ? BLUE : GOLD} transparent opacity={0.15} lineWidth={1} />
         ))}
         {nodes.map((p, i) => (
-          <mesh key={i} position={p} scale={0.22}>
+          <mesh key={i} position={p} scale={0.15}>
             <sphereGeometry args={[1, 24, 24]} />
             <meshStandardMaterial
               color={i % 2 === 0 ? BLUE : GOLD}
               emissive={i % 2 === 0 ? BLUE : GOLD}
-              emissiveIntensity={0.9}
+              emissiveIntensity={0.7}
               roughness={0.25}
               metalness={0.3}
             />
@@ -197,7 +198,7 @@ function ProjectsStop() {
     })
   })
   return (
-    <group ref={groupRef} position={[0, 0, STOPS.projects]}>
+    <group ref={groupRef} position={[0, 0, STOPS.projects - 1.8]} scale={0.85}>
       {PROJECT_POSITIONS.map(([x, y], i) => (
         <mesh
           key={i}
@@ -212,7 +213,6 @@ function ProjectsStop() {
             {...TRANSMISSION_PROPS}
             color={i % 2 === 0 ? '#1c2550' : '#3a2410'}
             thickness={0.5}
-            chromaticAberration={0.06}
           />
         </mesh>
       ))}
@@ -236,7 +236,7 @@ function TimelineStop({ z, count, color }: { z: number; count: number; color: st
           <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.2} metalness={0.3} />
         </mesh>
       ))}
-      <Sparkles count={16} scale={[count * 1.6 + 1, 1, 1]} size={1} speed={0.15} color={color} opacity={0.4} />
+      <Sparkles count={10} scale={[count * 1.6 + 1, 1, 1]} size={0.9} speed={0.15} color={color} opacity={0.3} />
     </group>
   )
 }
@@ -258,7 +258,7 @@ function ContactStop() {
         <icosahedronGeometry args={[1, 2]} />
         <MeshTransmissionMaterial {...TRANSMISSION_PROPS} color="#20285a" thickness={0.8} />
       </mesh>
-      <Sparkles count={30} scale={4} size={1.2} speed={0.2} color={GOLD} opacity={0.45} />
+      <Sparkles count={20} scale={4} size={1.1} speed={0.2} color={GOLD} opacity={0.35} />
     </group>
   )
 }
@@ -278,7 +278,7 @@ export default function Scene3D({ theme }: { theme: 'dark' | 'light' }) {
         <directionalLight position={[-5, 1, 2]} intensity={theme === 'light' ? 0.8 : 1.5} color="#ffb04d" />
         <directionalLight position={[-2, -3, -5]} intensity={theme === 'light' ? 1.1 : 2} color={BLUE} />
         <pointLight position={[0, 1, 5]} intensity={theme === 'light' ? 0.5 : 1} color="#ffffff" />
-        <Environment preset={theme === 'light' ? 'city' : 'night'} resolution={256} />
+        <Environment preset={theme === 'light' ? 'apartment' : 'night'} resolution={256} />
         <CameraRig />
         <HomeStop theme={theme} />
         <AboutStop />

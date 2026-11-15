@@ -255,6 +255,7 @@ function App() {
   return (
     <MotionConfig reducedMotion="user">
       <Scene3D theme={theme} />
+      <div className="scene-scrim" />
 
       <div className="page-content">
       <header className="navbar">
