@@ -661,19 +661,23 @@ type TermLine =
   | { kind: 'neofetch' }
 
 const PAGE_LOAD_TIME = Date.now()
-const NEOFETCH_GLYPH = ['  /\\  ', ' /  \\ ', '/_/\\_\\', '\\    /', ' \\  / ', '  \\/  ']
+const NEOFETCH_GLYPH = ['┏━━━━━━━┓', '┃  >_   ┃', '┗━━━━━━━┛']
+const NEOFETCH_SWATCH = ['#5b7cff', '#ffa62b', '#e85656', '#56c285', '#c97be8', '#4fc1e0']
 
 function Neofetch({ theme }: { theme: Theme }) {
   const [uptimeSec] = useState(() => Math.max(0, Math.round((Date.now() - PAGE_LOAD_TIME) / 1000)))
   const rows: Array<[string, string]> = [
     ['user@host', 'tejas_malhotra@portfolio'],
-    ['OS', 'PortfolioOS (React 19 + Vite)'],
-    ['Host', 'github.com/ApparentlyTejas'],
-    ['Languages', 'Python, TypeScript, C++'],
-    ['Stack', 'FastAPI, PostgreSQL, Docker, AWS'],
-    ['Theme', `${theme} (accent: blue/orange)`],
-    ['Status', 'open to internships'],
+    ['OS', `PortfolioOS ${theme} edition`],
+    ['Kernel', 'react-19.3.1-cracked'],
     ['Uptime', `${uptimeSec}s this session`],
+    ['Packages', `${PROJECTS.length} (shipped)`],
+    ['Shell', 'zsh + way too much coffee'],
+    ['DE', 'Vite'],
+    ['Terminal', "you're looking at it"],
+    ['CPU', 'Caffeine x1 (100% load)'],
+    ['Languages', 'Python, TypeScript, C++'],
+    ['Status', 'open to internships'],
   ]
   return (
     <div className="neofetch">
@@ -685,6 +689,11 @@ function Neofetch({ theme }: { theme: Theme }) {
             <span className="neofetch-val">{v}</span>
           </div>
         ))}
+        <div className="neofetch-swatch">
+          {NEOFETCH_SWATCH.map((c) => (
+            <span key={c} style={{ background: c }} />
+          ))}
+        </div>
       </div>
     </div>
   )
