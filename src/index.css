@@ -17,7 +17,7 @@
   --ink: #05070a;
   --mono: 'IBM Plex Mono', Consolas, monospace;
   --sans: 'IBM Plex Sans', Helvetica, Arial, sans-serif;
-  --display: 'Space Grotesk', var(--sans);
+  --display: var(--mono);
 }
 
 :root[data-theme='light'] {

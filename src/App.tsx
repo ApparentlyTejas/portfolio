@@ -631,17 +631,50 @@ type TermLine =
   | { kind: 'input'; text: string }
   | { kind: 'output'; text: string }
   | { kind: 'render' }
+  | { kind: 'neofetch' }
+
+const PAGE_LOAD_TIME = Date.now()
+const NEOFETCH_GLYPH = ['  /\\  ', ' /  \\ ', '/_/\\_\\', '\\    /', ' \\  / ', '  \\/  ']
+
+function Neofetch({ theme }: { theme: Theme }) {
+  const [uptimeSec] = useState(() => Math.max(0, Math.round((Date.now() - PAGE_LOAD_TIME) / 1000)))
+  const rows: Array<[string, string]> = [
+    ['user@host', 'tejas_malhotra@portfolio'],
+    ['OS', 'PortfolioOS (React 19 + Vite)'],
+    ['Host', 'github.com/ApparentlyTejas'],
+    ['Languages', 'Python, TypeScript, C++'],
+    ['Stack', 'FastAPI, PostgreSQL, Docker, AWS'],
+    ['Theme', `${theme} (accent: blue/orange)`],
+    ['Status', 'open to internships'],
+    ['Uptime', `${uptimeSec}s this session`],
+  ]
+  return (
+    <div className="neofetch">
+      <pre className="neofetch-glyph" aria-hidden="true">{NEOFETCH_GLYPH.join('\n')}</pre>
+      <div className="neofetch-rows">
+        {rows.map(([k, v]) => (
+          <div key={k} className="neofetch-row">
+            <span className="neofetch-key">{k}</span>
+            <span className="neofetch-val">{v}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function InteractiveTerminal({
+  theme,
   onGoto,
   onThemeChange,
+  onMatrix,
 }: {
+  theme: Theme
   onGoto: (id: string) => void
   onThemeChange: (t: Theme) => void
+  onMatrix: () => void
 }) {
-  const [lines, setLines] = useState<TermLine[]>([
-    { kind: 'output', text: "tejas-portfolio v1.0.0 — type 'help' to get started" },
-  ])
+  const [lines, setLines] = useState<TermLine[]>([{ kind: 'neofetch' }])
   const [input, setInput] = useState('')
   const [history, setHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState<number | null>(null)
@@ -662,7 +695,14 @@ function InteractiveTerminal({
 
     switch (name) {
       case 'help':
-        print('commands: whoami, about, skills, projects, experience, education, contact, goto <section>, theme <dark|light>, render, ls, clear')
+        print('commands: whoami, neofetch, about, skills, projects, experience, education, contact, goto <section>, theme <dark|light>, render, matrix, ls, clear')
+        break
+      case 'neofetch':
+        setLines((l) => [...l, { kind: 'neofetch' }])
+        break
+      case 'matrix':
+        print('wake up...')
+        onMatrix()
         break
       case 'whoami':
         print('tejas_malhotra — software engineer, M.Sc. ICT @ FAU Erlangen')
@@ -764,6 +804,9 @@ function InteractiveTerminal({
               </div>
             )
           }
+          if (line.kind === 'neofetch') {
+            return <Neofetch key={i} theme={theme} />
+          }
           return (
             <div key={i} className={`term-line ${line.kind}`}>
               {line.kind === 'input' ? <span className="term-prompt">$</span> : null}
@@ -773,9 +816,13 @@ function InteractiveTerminal({
         })}
         <div className="term-line input-row">
           <span className="term-prompt">$</span>
+          <span className="term-input-display">
+            {input}
+            <span className="command-cursor" aria-hidden="true" />
+          </span>
           <input
             ref={inputRef}
-            className="term-input"
+            className="term-input-hidden"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -948,6 +995,7 @@ function App() {
         <span className="aurora-blob aurora-gold" />
         <span className="aurora-blob aurora-blue-2" />
       </div>
+      <div className="scanlines" aria-hidden="true" />
 
       <div className="page-content">
       <header className="navbar">
@@ -999,16 +1047,16 @@ function App() {
       <section id="home" className="hero-section">
         <div className="hero">
           <motion.span
-            className="badge"
+            className="hero-eyebrow"
             initial={{ opacity: 0, y: 10 }}
             animate={booted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, ease: EASE }}
           >
-            <span className="dot" /> M.Sc. ICT @ FAU Erlangen &middot; Open to internships
+            $ whoami
           </motion.span>
 
-          <h1 className="hero-title" aria-label="Hi, I'm Tejas">
-            {'Hi, I’m Tejas'.split('').map((ch, i) => (
+          <h1 className="hero-title" aria-label="tejas_malhotra">
+            {'tejas_malhotra'.split('').map((ch, i) => (
               <motion.span
                 key={i}
                 className="char"
@@ -1019,7 +1067,17 @@ function App() {
                 {ch === ' ' ? ' ' : ch}
               </motion.span>
             ))}
+            <span className="command-cursor hero-cursor" aria-hidden="true" />
           </h1>
+
+          <motion.span
+            className="badge"
+            initial={{ opacity: 0, y: 10 }}
+            animate={booted ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: 0.15, ease: EASE }}
+          >
+            <span className="dot" /> M.Sc. ICT @ FAU Erlangen &middot; Open to internships
+          </motion.span>
 
           <motion.p
             className="hero-sub"
@@ -1060,8 +1118,10 @@ function App() {
         <CommandHeader>$ ssh tejas@portfolio</CommandHeader>
         <Reveal className="wireframe-wrap">
           <InteractiveTerminal
+            theme={theme}
             onGoto={(id) => document.getElementById(id)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })}
             onThemeChange={setTheme}
+            onMatrix={() => setMatrixActive(true)}
           />
         </Reveal>
       </Section>
@@ -1099,10 +1159,10 @@ function App() {
       <Section id="skills">
         <CommandHeader>$ skills --stack</CommandHeader>
         <StaggerGrid className="skills-grid">
-          {SKILLS.map((s) => (
+          {SKILLS.map((s, i) => (
             <motion.div className="skill-card" key={s.label} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="skill-card-head">
-                <span>{s.label}</span>
+                <span><span className="card-index">{String(i + 1).padStart(2, '0')}</span> {s.label}</span>
                 <span className="skill-count">{s.count}</span>
               </div>
               <ul>
@@ -1118,9 +1178,10 @@ function App() {
       <Section id="projects">
         <CommandHeader>$ projects --selected</CommandHeader>
         <StaggerGrid className="projects-grid">
-          {PROJECTS.map((p) => (
+          {PROJECTS.map((p, i) => (
             <motion.div className="project-card" key={p.title} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="project-head">
+                <span className="card-index">{String(i + 1).padStart(2, '0')}</span>
                 <span className="project-category">{p.category}</span>
               </div>
               <h3>{p.title}</h3>
