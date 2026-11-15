@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { motion, MotionConfig, useReducedMotion } from 'framer-motion'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion, MotionConfig, useMotionValue, useReducedMotion, useSpring } from 'framer-motion'
 import './App.css'
 
 const NAV_LINKS = [
@@ -199,7 +199,13 @@ type Theme = 'dark' | 'light'
 
 function getInitialTheme(): Theme {
   if (typeof window === 'undefined') return 'dark'
-  return window.localStorage.getItem('theme') === 'light' ? 'light' : 'dark'
+  try {
+    const stored = window.localStorage.getItem('theme')
+    if (stored === 'light' || stored === 'dark') return stored
+  } catch {
+    // localStorage unavailable; fall through to system preference
+  }
+  return window.matchMedia?.('(prefers-color-scheme: light)').matches ? 'light' : 'dark'
 }
 
 function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
@@ -223,14 +229,355 @@ function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }
   )
 }
 
+const BOOT_LINES = [
+  { cmd: '$ whoami', out: 'tejas_malhotra' },
+  { cmd: '$ status --check', out: 'online // open to internships' },
+  { cmd: '$ portfolio --init', out: 'done.' },
+]
+
+const BOOT_SEEN_KEY = 'boot-seen'
+
+function BootSequence({ onComplete }: { onComplete: () => void }) {
+  const [lineIndex, setLineIndex] = useState(0)
+  const [charIndex, setCharIndex] = useState(0)
+  const [showOutput, setShowOutput] = useState(false)
+
+  useEffect(() => {
+    if (lineIndex >= BOOT_LINES.length) {
+      const t = setTimeout(onComplete, 350)
+      return () => clearTimeout(t)
+    }
+    const line = BOOT_LINES[lineIndex].cmd
+    if (charIndex < line.length) {
+      const t = setTimeout(() => setCharIndex((c) => c + 1), 22)
+      return () => clearTimeout(t)
+    }
+    const t = setTimeout(() => setShowOutput(true), 120)
+    return () => clearTimeout(t)
+  }, [lineIndex, charIndex, onComplete])
+
+  useEffect(() => {
+    if (!showOutput) return
+    const t = setTimeout(() => {
+      setShowOutput(false)
+      setCharIndex(0)
+      setLineIndex((i) => i + 1)
+    }, 260)
+    return () => clearTimeout(t)
+  }, [showOutput])
+
+  return (
+    <motion.div
+      className="boot-overlay"
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.4, ease: EASE }}
+    >
+      <div className="boot-lines">
+        {BOOT_LINES.slice(0, lineIndex).map((l) => (
+          <div key={l.cmd} className="boot-line">
+            <span className="boot-cmd">{l.cmd}</span>
+            <span className="boot-out">{l.out}</span>
+          </div>
+        ))}
+        {lineIndex < BOOT_LINES.length && (
+          <div className="boot-line">
+            <span className="boot-cmd">
+              {BOOT_LINES[lineIndex].cmd.slice(0, charIndex)}
+              <span className="command-cursor" aria-hidden="true" />
+            </span>
+            {showOutput && <span className="boot-out">{BOOT_LINES[lineIndex].out}</span>}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+type Command = {
+  id: string
+  label: string
+  hint?: string
+  run: () => void
+}
+
+function CommandPalette({ commands, onClose }: { commands: Command[]; onClose: () => void }) {
+  const [query, setQuery] = useState('')
+  const [highlight, setHighlight] = useState(0)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const filtered = useMemo(
+    () => commands.filter((c) => c.label.toLowerCase().includes(query.toLowerCase())),
+    [commands, query]
+  )
+
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value)
+    setHighlight(0)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose()
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      setHighlight((h) => Math.min(h + 1, filtered.length - 1))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      setHighlight((h) => Math.max(h - 1, 0))
+    } else if (e.key === 'Enter' && filtered[highlight]) {
+      filtered[highlight].run()
+      onClose()
+    }
+  }
+
+  return (
+    <div className="palette-backdrop" onClick={onClose}>
+      <motion.div
+        className="palette"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: -12, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -12, scale: 0.98 }}
+        transition={{ duration: 0.18, ease: EASE }}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
+      >
+        <div className="palette-input-row">
+          <span className="palette-prompt">$</span>
+          <input
+            ref={inputRef}
+            className="palette-input"
+            placeholder="type a command..."
+            value={query}
+            onChange={(e) => handleQueryChange(e.target.value)}
+            onKeyDown={handleKeyDown}
+          />
+          <kbd className="palette-esc">esc</kbd>
+        </div>
+        <ul className="palette-list">
+          {filtered.length === 0 && <li className="palette-empty">no matches</li>}
+          {filtered.map((c, i) => (
+            <li
+              key={c.id}
+              className={i === highlight ? 'active' : ''}
+              onMouseEnter={() => setHighlight(i)}
+              onClick={() => {
+                c.run()
+                onClose()
+              }}
+            >
+              <span>{c.label}</span>
+              {c.hint && <span className="palette-hint">{c.hint}</span>}
+            </li>
+          ))}
+        </ul>
+      </motion.div>
+    </div>
+  )
+}
+
+const KONAMI = [
+  'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown',
+  'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+  'b', 'a',
+]
+
+function useKonamiCode(onActivate: () => void) {
+  useEffect(() => {
+    let progress = 0
+    const handler = (e: KeyboardEvent) => {
+      const expected = KONAMI[progress]
+      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key
+      if (key === expected) {
+        progress += 1
+        if (progress === KONAMI.length) {
+          progress = 0
+          onActivate()
+        }
+      } else {
+        progress = key === KONAMI[0] ? 1 : 0
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onActivate])
+}
+
+function MatrixRain({ onDone }: { onDone: () => void }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+    const fontSize = 16
+    const columns = Math.floor(canvas.width / fontSize)
+    const drops = new Array(columns).fill(1)
+    const chars = '01アイウエオカキクケコ{}[]<>/;=+'
+
+    let frame: number
+    const draw = () => {
+      ctx.fillStyle = 'rgba(5, 7, 10, 0.08)'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.fillStyle = '#5b7cff'
+      ctx.font = `${fontSize}px monospace`
+      drops.forEach((y, i) => {
+        const text = chars[Math.floor(Math.random() * chars.length)]
+        ctx.fillText(text, i * fontSize, y * fontSize)
+        if (y * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0
+        drops[i] += 1
+      })
+      frame = requestAnimationFrame(draw)
+    }
+    draw()
+
+    const timeout = setTimeout(onDone, 4200)
+    return () => {
+      cancelAnimationFrame(frame)
+      clearTimeout(timeout)
+    }
+  }, [onDone])
+
+  return (
+    <motion.div
+      className="matrix-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <canvas ref={canvasRef} />
+      <div className="matrix-message">ACCESS GRANTED // nice, you found it</div>
+    </motion.div>
+  )
+}
+
+function useScrollProgress() {
+  const [progress, setProgress] = useState(0)
+  useEffect(() => {
+    let ticking = false
+    const update = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      setProgress(max > 0 ? Math.min(Math.max(window.scrollY / max, 0), 1) : 0)
+      ticking = false
+    }
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(update)
+        ticking = true
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    update()
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return progress
+}
+
+function MagneticLink({ className, href, target, rel, children }: {
+  className: string
+  href: string
+  target?: string
+  rel?: string
+  children: React.ReactNode
+}) {
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  const springX = useSpring(x, { stiffness: 300, damping: 20, mass: 0.4 })
+  const springY = useSpring(y, { stiffness: 300, damping: 20, mass: 0.4 })
+
+  const handleMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    x.set((e.clientX - rect.left - rect.width / 2) * 0.35)
+    y.set((e.clientY - rect.top - rect.height / 2) * 0.35)
+  }
+  const handleLeave = () => {
+    x.set(0)
+    y.set(0)
+  }
+
+  return (
+    <motion.a
+      href={href}
+      target={target}
+      rel={rel}
+      className={className}
+      style={{ x: springX, y: springY }}
+      onMouseMove={handleMove}
+      onMouseLeave={handleLeave}
+    >
+      {children}
+    </motion.a>
+  )
+}
+
 function App() {
+  const reduceMotion = useReducedMotion()
   const [booted, setBooted] = useState(false)
+  const [showBoot, setShowBoot] = useState(() => {
+    if (typeof window === 'undefined') return false
+    try {
+      return window.sessionStorage.getItem(BOOT_SEEN_KEY) !== '1'
+    } catch {
+      return true
+    }
+  })
   const [menuOpen, setMenuOpen] = useState(false)
   const [theme, setTheme] = useState<Theme>(getInitialTheme)
   const [activeSection, setActiveSection] = useState('home')
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [matrixActive, setMatrixActive] = useState(false)
+  const scrollProgress = useScrollProgress()
+
+  const finishBoot = useCallback(() => {
+    setShowBoot(false)
+    setBooted(true)
+    try {
+      window.sessionStorage.setItem(BOOT_SEEN_KEY, '1')
+    } catch {
+      // sessionStorage unavailable; boot just replays next time
+    }
+  }, [])
+
   useEffect(() => {
-    const id = requestAnimationFrame(() => setBooted(true))
-    return () => cancelAnimationFrame(id)
+    if (!showBoot || reduceMotion) {
+      const id = requestAnimationFrame(() => setBooted(true))
+      return () => cancelAnimationFrame(id)
+    }
+  }, [showBoot, reduceMotion])
+
+  useEffect(() => {
+    console.log(
+      '%cHey, nice of you to check the console.',
+      'color:#5b7cff;font-size:15px;font-weight:bold;'
+    )
+    console.log(
+      '%cLooking for someone who ships → github.com/ApparentlyTejas',
+      'color:#ffa62b;font-size:12px;'
+    )
+    console.log('%cPsst: try the Konami code.', 'color:#9ba3b2;font-size:11px;')
+  }, [])
+
+  useKonamiCode(useCallback(() => setMatrixActive(true), []))
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setPaletteOpen((v) => !v)
+      }
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
   }, [])
 
   useEffect(() => {
@@ -249,15 +596,84 @@ function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    window.localStorage.setItem('theme', theme)
+    try {
+      window.localStorage.setItem('theme', theme)
+    } catch {
+      // localStorage unavailable; theme just won't persist
+    }
     const meta = document.querySelector('meta[name="theme-color"]')
     meta?.setAttribute('content', theme === 'light' ? '#f7f8fb' : '#05070a')
   }, [theme])
 
   const toggleTheme = () => setTheme((t) => (t === 'dark' ? 'light' : 'dark'))
 
+  const jumpTo = (id: string) => () => {
+    document.getElementById(id)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
+  }
+
+  const commands: Command[] = useMemo(
+    () => [
+      ...NAV_LINKS.map((l) => ({
+        id: `goto-${l.href}`,
+        label: `Go to ${l.label}`,
+        hint: 'nav',
+        run: jumpTo(l.href.slice(1)),
+      })),
+      {
+        id: 'toggle-theme',
+        label: `Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`,
+        hint: 'theme',
+        run: toggleTheme,
+      },
+      {
+        id: 'open-github',
+        label: 'Open GitHub profile',
+        hint: '↗',
+        run: () => window.open('https://github.com/ApparentlyTejas', '_blank', 'noreferrer'),
+      },
+      {
+        id: 'open-linkedin',
+        label: 'Open LinkedIn profile',
+        hint: '↗',
+        run: () => window.open('https://www.linkedin.com/in/tejasmalhotra410850207', '_blank', 'noreferrer'),
+      },
+      {
+        id: 'copy-email',
+        label: 'Copy email address',
+        hint: 'clipboard',
+        run: () => {
+          navigator.clipboard?.writeText('tejas.malhotra.14@gmail.com')
+        },
+      },
+      {
+        id: 'open-resume',
+        label: 'Open résumé',
+        hint: 'pdf',
+        run: () => window.open(`${import.meta.env.BASE_URL}resume.pdf?v=2`, '_blank', 'noreferrer'),
+      },
+    ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [theme]
+  )
+
   return (
     <MotionConfig reducedMotion="user">
+      <AnimatePresence>
+        {showBoot && !reduceMotion && <BootSequence key="boot" onComplete={finishBoot} />}
+      </AnimatePresence>
+
+      <div className="scroll-progress" style={{ transform: `scaleX(${scrollProgress})` }} />
+
+      <AnimatePresence>
+        {paletteOpen && (
+          <CommandPalette key="palette" commands={commands} onClose={() => setPaletteOpen(false)} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {matrixActive && <MatrixRain key="matrix" onDone={() => setMatrixActive(false)} />}
+      </AnimatePresence>
+
       <div className="aurora" aria-hidden="true">
         <span className="aurora-blob aurora-blue" />
         <span className="aurora-blob aurora-gold" />
@@ -266,7 +682,7 @@ function App() {
 
       <div className="page-content">
       <header className="navbar">
-        <a href="#home" className="brand">tejas malhotra</a>
+        <a href="#home" className="brand" data-text="tejas malhotra">tejas malhotra</a>
         <nav className="nav-desktop">
           {NAV_LINKS.map((l) => (
             <a key={l.href} href={l.href} className={activeSection === l.href.slice(1) ? 'active' : ''}>
@@ -281,6 +697,9 @@ function App() {
             </a>
           ))}
         </nav>
+        <button className="palette-hint-btn" onClick={() => setPaletteOpen(true)} aria-label="Open command palette">
+          <span>⌘</span>K
+        </button>
         <ThemeToggle theme={theme} onToggle={toggleTheme} />
         <button
           className={`menu-btn ${menuOpen ? 'open' : ''}`}
@@ -361,9 +780,9 @@ function App() {
             animate={booted ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 1.25, ease: EASE }}
           >
-            <a href="#projects" className="btn btn-primary">View Projects</a>
-            <a href="#contact" className="btn btn-ghost">Get in Touch</a>
-            <a href={`${import.meta.env.BASE_URL}resume.pdf?v=2`} className="btn btn-ghost">Resume</a>
+            <MagneticLink href="#projects" className="btn btn-primary">View Projects</MagneticLink>
+            <MagneticLink href="#contact" className="btn btn-ghost">Get in Touch</MagneticLink>
+            <MagneticLink href={`${import.meta.env.BASE_URL}resume.pdf?v=2`} className="btn btn-ghost">Resume</MagneticLink>
           </motion.div>
         </div>
       </section>
