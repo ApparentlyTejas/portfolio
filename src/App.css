@@ -232,6 +232,57 @@
   width: min(560px, 86vw);
 }
 
+/* Foldable-phone hinge intro */
+.fold-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 190;
+  pointer-events: none;
+  perspective: 1400px;
+}
+
+.fold-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  background: var(--bg);
+  backface-visibility: hidden;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.35);
+}
+
+.fold-panel-left {
+  left: 0;
+  transform-origin: left center;
+  justify-content: flex-end;
+}
+
+.fold-panel-right {
+  right: 0;
+  transform-origin: right center;
+  justify-content: flex-start;
+}
+
+.fold-camera {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface-border);
+  margin: 0 18px;
+}
+
+.fold-seam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: linear-gradient(to bottom, transparent, rgba(91, 124, 255, 0.5), transparent);
+}
+
 .boot-line {
   display: flex;
   flex-direction: column;

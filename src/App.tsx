@@ -293,6 +293,33 @@ function BootSequence({ onComplete }: { onComplete: () => void }) {
   )
 }
 
+/* A foldable-phone-style hinge intro: two panels covering the screen
+   swing open from a center seam to reveal the page already underneath. */
+function FoldIntro({ onComplete }: { onComplete: () => void }) {
+  return (
+    <div className="fold-stage" aria-hidden="true">
+      <motion.div
+        className="fold-panel fold-panel-left"
+        initial={{ rotateY: 0 }}
+        animate={{ rotateY: -100 }}
+        transition={{ duration: 0.9, delay: 0.15, ease: [0.76, 0, 0.24, 1] }}
+      >
+        <span className="fold-camera" />
+      </motion.div>
+      <motion.div
+        className="fold-panel fold-panel-right"
+        initial={{ rotateY: 0 }}
+        animate={{ rotateY: 100 }}
+        transition={{ duration: 0.9, delay: 0.15, ease: [0.76, 0, 0.24, 1] }}
+        onAnimationComplete={onComplete}
+      >
+        <span className="fold-camera" />
+      </motion.div>
+      <div className="fold-seam" />
+    </div>
+  )
+}
+
 type Command = {
   id: string
   label: string
@@ -852,11 +879,13 @@ function App() {
   const [activeSection, setActiveSection] = useState('home')
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [matrixActive, setMatrixActive] = useState(false)
+  const [showFold, setShowFold] = useState(false)
   const scrollProgress = useScrollProgress()
 
   const finishBoot = useCallback(() => {
     setShowBoot(false)
     setBooted(true)
+    setShowFold(true)
     try {
       window.sessionStorage.setItem(BOOT_SEEN_KEY, '1')
     } catch {
@@ -977,6 +1006,8 @@ function App() {
       <AnimatePresence>
         {showBoot && !reduceMotion && <BootSequence key="boot" onComplete={finishBoot} />}
       </AnimatePresence>
+
+      {showFold && <FoldIntro key="fold" onComplete={() => setShowFold(false)} />}
 
       <div className="scroll-progress" style={{ transform: `scaleX(${scrollProgress})` }} />
 
