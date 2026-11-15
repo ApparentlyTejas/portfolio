@@ -158,52 +158,20 @@ h3 {
   justify-content: center;
   overflow: hidden;
   padding: 140px clamp(20px, 5vw, 64px) 100px;
-}
-
-.scene3d-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-}
-
-/* Keeps text readable against the 3D scene everywhere outside the hero;
-   the hero gets its own lighter fade so its centerpiece stays visible. */
-.scene-scrim {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background: rgba(var(--bg-rgb), 0.68);
-}
-
-:root[data-theme='dark'] .scene-scrim {
-  background: rgba(var(--bg-rgb), 0.4);
+  background:
+    radial-gradient(ellipse 65% 55% at 50% 10%, rgba(91, 124, 255, 0.1) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 45% at 85% 85%, rgba(255, 166, 43, 0.07) 0%, transparent 60%);
 }
 
 .page-content {
   position: relative;
-  z-index: 1;
-}
-
-/* Soft edge vignette only, layered on top of .scene-scrim: keeps the hero
-   gem readable without re-darkening the text area a second time. */
-.hero-fade {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse 75% 65% at 50% 46%, transparent 0%, transparent 45%, rgba(var(--bg-rgb), 0.3) 75%, rgba(var(--bg-rgb), 0.55) 100%);
-  pointer-events: none;
 }
 
 .hero {
   position: relative;
-  z-index: 2;
   max-width: 820px;
   margin: 0 auto;
   text-align: center;
-}
-
-.hero-title {
-  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85), 0 6px 44px rgba(0, 0, 0, 0.7);
 }
 
 .hero-sub {

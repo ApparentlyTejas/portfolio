@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { motion, MotionConfig, useReducedMotion } from 'framer-motion'
-import Scene3D from './Scene3D'
 import './App.css'
 
 const NAV_LINKS = [
@@ -254,9 +253,6 @@ function App() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <Scene3D theme={theme} />
-      <div className="scene-scrim" />
-
       <div className="page-content">
       <header className="navbar">
         <a href="#home" className="brand">tejas malhotra</a>
@@ -302,7 +298,6 @@ function App() {
       )}
 
       <section id="home" className="hero-section">
-        <div className="hero-fade" />
         <div className="hero">
           <motion.span
             className="badge"
