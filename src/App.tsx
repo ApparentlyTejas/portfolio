@@ -520,6 +520,113 @@ function MagneticLink({ className, href, target, rel, children }: {
   )
 }
 
+/* A dependency-free 3D wireframe icosahedron, drawn with plain <canvas>
+   trig/projection math — a geodesic "network" shape fits the distributed-
+   systems brand, and it's a nicer flex than importing a 3D engine for it. */
+const PHI = (1 + Math.sqrt(5)) / 2
+const ICOSA_VERTICES: Array<[number, number, number]> = [
+  [-1, PHI, 0], [1, PHI, 0], [-1, -PHI, 0], [1, -PHI, 0],
+  [0, -1, PHI], [0, 1, PHI], [0, -1, -PHI], [0, 1, -PHI],
+  [PHI, 0, -1], [PHI, 0, 1], [-PHI, 0, -1], [-PHI, 0, 1],
+]
+const ICOSA_EDGES: Array<[number, number]> = [
+  [0, 1], [0, 5], [0, 7], [0, 10], [0, 11],
+  [1, 5], [1, 7], [1, 8], [1, 9],
+  [2, 3], [2, 4], [2, 6], [2, 10], [2, 11],
+  [3, 4], [3, 6], [3, 8], [3, 9],
+  [4, 5], [4, 9], [4, 11],
+  [5, 9], [5, 11],
+  [6, 7], [6, 8], [6, 10],
+  [7, 8], [7, 10],
+  [8, 9],
+  [10, 11],
+]
+
+function WireframeModel({ accent, accent2 }: { accent: string; accent2: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const reduceMotion = useReducedMotion()
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const size = canvas.clientWidth
+    canvas.width = size * dpr
+    canvas.height = size * dpr
+    ctx.scale(dpr, dpr)
+
+    let angleX = 0.4
+    let angleY = 0
+    let frame: number
+    let visible = true
+
+    const render = () => {
+      ctx.clearRect(0, 0, size, size)
+      const scale = size * 0.32
+      const cx = size / 2
+      const cy = size / 2
+      const cosX = Math.cos(angleX)
+      const sinX = Math.sin(angleX)
+      const cosY = Math.cos(angleY)
+      const sinY = Math.sin(angleY)
+
+      const projected = ICOSA_VERTICES.map(([x, y, z]) => {
+        const y1 = y * cosX - z * sinX
+        const z1 = y * sinX + z * cosX
+        const x2 = x * cosY - z1 * sinY
+        const z2 = x * sinY + z1 * cosY
+        const perspective = 4 / (4 + z2)
+        return { x: cx + x2 * scale * perspective, y: cy + y1 * scale * perspective, z: z2 }
+      })
+
+      ctx.lineWidth = 1.2
+      ICOSA_EDGES.forEach(([a, b]) => {
+        const pa = projected[a]
+        const pb = projected[b]
+        const depth = (pa.z + pb.z) / 2
+        const alpha = 0.35 + (1 - (depth + 2) / 4) * 0.5
+        ctx.strokeStyle = accent
+        ctx.globalAlpha = Math.max(0.15, Math.min(1, alpha))
+        ctx.beginPath()
+        ctx.moveTo(pa.x, pa.y)
+        ctx.lineTo(pb.x, pb.y)
+        ctx.stroke()
+      })
+
+      ctx.globalAlpha = 1
+      projected.forEach((p) => {
+        ctx.fillStyle = accent2
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, 2.4, 0, Math.PI * 2)
+        ctx.fill()
+      })
+
+      if (!reduceMotion) {
+        angleY += 0.006
+        angleX += 0.0012
+      }
+      if (visible) frame = requestAnimationFrame(render)
+    }
+    render()
+
+    const onVisibility = () => {
+      visible = document.visibilityState === 'visible'
+      if (visible) frame = requestAnimationFrame(render)
+    }
+    document.addEventListener('visibilitychange', onVisibility)
+
+    return () => {
+      cancelAnimationFrame(frame)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [accent, accent2, reduceMotion])
+
+  return <canvas ref={canvasRef} className="wireframe-canvas" aria-hidden="true" />
+}
+
 function App() {
   const reduceMotion = useReducedMotion()
   const [booted, setBooted] = useState(false)
@@ -786,6 +893,26 @@ function App() {
           </motion.div>
         </div>
       </section>
+
+      <Section id="render">
+        <CommandHeader>$ render --model=icosahedron --engine=none</CommandHeader>
+        <Reveal className="wireframe-wrap">
+          <div className="terminal-box">
+            <div className="terminal-chrome">
+              <span className="dot dot-red" />
+              <span className="dot dot-yellow" />
+              <span className="dot dot-green" />
+              <span className="terminal-chrome-title">wireframe.ts</span>
+            </div>
+            <div className="terminal-body">
+              <WireframeModel accent="#5b7cff" accent2="#ffa62b" />
+              <p className="wireframe-caption">
+                No three.js, no WebGL. Just &lt;canvas&gt;, some trig, and a 12-vertex icosahedron rotating in JS.
+              </p>
+            </div>
+          </div>
+        </Reveal>
+      </Section>
 
       <Section id="about">
         <CommandHeader>$ about --me</CommandHeader>
