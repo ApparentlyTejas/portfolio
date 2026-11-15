@@ -627,6 +627,168 @@ function WireframeModel({ accent, accent2 }: { accent: string; accent2: string }
   return <canvas ref={canvasRef} className="wireframe-canvas" aria-hidden="true" />
 }
 
+type TermLine =
+  | { kind: 'input'; text: string }
+  | { kind: 'output'; text: string }
+  | { kind: 'render' }
+
+function InteractiveTerminal({
+  onGoto,
+  onThemeChange,
+}: {
+  onGoto: (id: string) => void
+  onThemeChange: (t: Theme) => void
+}) {
+  const [lines, setLines] = useState<TermLine[]>([
+    { kind: 'output', text: "tejas-portfolio v1.0.0 — type 'help' to get started" },
+  ])
+  const [input, setInput] = useState('')
+  const [history, setHistory] = useState<string[]>([])
+  const [historyIndex, setHistoryIndex] = useState<number | null>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight })
+  }, [lines])
+
+  const print = (text: string) => setLines((l) => [...l, { kind: 'output', text }])
+
+  const run = (raw: string) => {
+    const cmd = raw.trim()
+    setLines((l) => [...l, { kind: 'input', text: cmd }])
+    if (!cmd) return
+    const [name, ...args] = cmd.toLowerCase().split(/\s+/)
+
+    switch (name) {
+      case 'help':
+        print('commands: whoami, about, skills, projects, experience, education, contact, goto <section>, theme <dark|light>, render, ls, clear')
+        break
+      case 'whoami':
+        print('tejas_malhotra — software engineer, M.Sc. ICT @ FAU Erlangen')
+        break
+      case 'about':
+        print("I build across the stack and test things by actually breaking them. See the 'about' section below for the rest.")
+        break
+      case 'ls':
+        print(NAV_LINKS.map((l) => l.label.toLowerCase()).join('  '))
+        break
+      case 'skills':
+        print(SKILLS.map((s) => s.label).join(' · '))
+        break
+      case 'projects':
+        PROJECTS.forEach((p) => print(`${p.title} — ${p.github}`))
+        break
+      case 'experience':
+        print("See the 'experience' section below for the full timeline.")
+        onGoto('experience')
+        break
+      case 'education':
+        onGoto('education')
+        print("Jumped to 'education'.")
+        break
+      case 'contact':
+        print('tejas.malhotra.14@gmail.com · github.com/ApparentlyTejas · linkedin.com/in/tejasmalhotra410850207')
+        break
+      case 'theme':
+        if (args[0] === 'light' || args[0] === 'dark') {
+          onThemeChange(args[0])
+          print(`theme set to ${args[0]}`)
+        } else {
+          print('usage: theme <dark|light>')
+        }
+        break
+      case 'goto':
+        if (args[0] && NAV_LINKS.some((l) => l.href === `#${args[0]}`)) {
+          onGoto(args[0])
+          print(`jumped to '${args[0]}'`)
+        } else {
+          print(`unknown section '${args[0] ?? ''}'. try: ${NAV_LINKS.map((l) => l.href.slice(1)).join(', ')}`)
+        }
+        break
+      case 'render':
+      case '3d':
+        setLines((l) => [...l, { kind: 'render' }])
+        break
+      case 'sudo':
+        print('nice try. permission denied.')
+        break
+      case 'clear':
+        setLines([])
+        return
+      default:
+        print(`command not found: ${name}. try 'help'`)
+    }
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      run(input)
+      setHistory((h) => [...h, input])
+      setHistoryIndex(null)
+      setInput('')
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (history.length === 0) return
+      const next = historyIndex === null ? history.length - 1 : Math.max(0, historyIndex - 1)
+      setHistoryIndex(next)
+      setInput(history[next])
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (historyIndex === null) return
+      const next = historyIndex + 1
+      if (next >= history.length) {
+        setHistoryIndex(null)
+        setInput('')
+      } else {
+        setHistoryIndex(next)
+        setInput(history[next])
+      }
+    }
+  }
+
+  return (
+    <div className="terminal-box interactive" onClick={() => inputRef.current?.focus()}>
+      <div className="terminal-chrome">
+        <span className="dot dot-red" />
+        <span className="dot dot-yellow" />
+        <span className="dot dot-green" />
+        <span className="terminal-chrome-title">tejas@portfolio: ~</span>
+      </div>
+      <div className="terminal-body interactive-body" ref={bodyRef}>
+        {lines.map((line, i) => {
+          if (line.kind === 'render') {
+            return (
+              <div key={i} className="terminal-render">
+                <WireframeModel accent="#5b7cff" accent2="#ffa62b" />
+              </div>
+            )
+          }
+          return (
+            <div key={i} className={`term-line ${line.kind}`}>
+              {line.kind === 'input' ? <span className="term-prompt">$</span> : null}
+              <span>{line.text}</span>
+            </div>
+          )
+        })}
+        <div className="term-line input-row">
+          <span className="term-prompt">$</span>
+          <input
+            ref={inputRef}
+            className="term-input"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            autoComplete="off"
+            spellCheck={false}
+            aria-label="Terminal command input"
+          />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const reduceMotion = useReducedMotion()
   const [booted, setBooted] = useState(false)
@@ -895,22 +1057,12 @@ function App() {
       </section>
 
       <Section id="render">
-        <CommandHeader>$ render --model=icosahedron --engine=none</CommandHeader>
+        <CommandHeader>$ ssh tejas@portfolio</CommandHeader>
         <Reveal className="wireframe-wrap">
-          <div className="terminal-box">
-            <div className="terminal-chrome">
-              <span className="dot dot-red" />
-              <span className="dot dot-yellow" />
-              <span className="dot dot-green" />
-              <span className="terminal-chrome-title">wireframe.ts</span>
-            </div>
-            <div className="terminal-body">
-              <WireframeModel accent="#5b7cff" accent2="#ffa62b" />
-              <p className="wireframe-caption">
-                No three.js, no WebGL. Just &lt;canvas&gt;, some trig, and a 12-vertex icosahedron rotating in JS.
-              </p>
-            </div>
-          </div>
+          <InteractiveTerminal
+            onGoto={(id) => document.getElementById(id)?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })}
+            onThemeChange={setTheme}
+          />
         </Reveal>
       </Section>
 
