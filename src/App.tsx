@@ -145,7 +145,12 @@ function Section({ id, children }: { id: string; children: React.ReactNode }) {
 }
 
 function CommandHeader({ children }: { children: string }) {
-  return <h2 className="command-header">{children}</h2>
+  return (
+    <h2 className="command-header">
+      {children}
+      <span className="command-cursor" aria-hidden="true" />
+    </h2>
+  )
 }
 
 const EASE = [0.16, 1, 0.3, 1] as const
@@ -253,6 +258,12 @@ function App() {
 
   return (
     <MotionConfig reducedMotion="user">
+      <div className="aurora" aria-hidden="true">
+        <span className="aurora-blob aurora-blue" />
+        <span className="aurora-blob aurora-gold" />
+        <span className="aurora-blob aurora-blue-2" />
+      </div>
+
       <div className="page-content">
       <header className="navbar">
         <a href="#home" className="brand">tejas malhotra</a>
