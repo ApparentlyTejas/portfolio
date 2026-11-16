@@ -999,7 +999,8 @@ h3 {
 
 .project-card,
 .skill-card,
-.timeline-card {
+.timeline-card,
+.oss-card {
   background: var(--surface);
   border: 1px solid var(--surface-border);
   border-radius: 0;
@@ -1012,7 +1013,8 @@ h3 {
 
 .project-card:hover,
 .skill-card:hover,
-.timeline-card:hover {
+.timeline-card:hover,
+.oss-card:hover {
   border-color: var(--accent-blue);
   box-shadow: 0 6px 0 var(--accent-blue);
 }
@@ -1073,6 +1075,31 @@ h3 {
   .projects-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Open source contributions */
+.oss-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+@media (max-width: 860px) {
+  .oss-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.oss-note {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--text-dim);
+  padding-left: 16px;
+}
+
+.oss-note strong {
+  color: var(--text);
 }
 
 .project-card:hover,

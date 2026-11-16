@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { href: '#home', label: 'Home' },
   { href: '#skills', label: 'Skills' },
   { href: '#projects', label: 'Projects' },
+  { href: '#oss', label: 'Open Source' },
   { href: '#experience', label: 'Experience' },
   { href: '#education', label: 'Education' },
   { href: '#contact', label: 'Contact' },
@@ -58,10 +59,10 @@ const PROJECTS = [
     title: 'RoomLock',
     desc: 'Concurrency-safe booking API. Found and reproduced a real double-booking race condition under concurrent load, then eliminated it two different ways and load-tested both.',
     bullets: [
-      'SELECT FOR UPDATE row lock vs. GiST EXCLUDE constraint, compared head to head',
-      'Locust load tests at 30 concurrent users: ~420 req/s → ~450-570 req/s, zero overlapping bookings',
-      '66 automated pytest tests against a real PostgreSQL instance, including a 20-request concurrency race',
-      'JWT auth with role-based access, fully containerized with Docker',
+      'SELECT FOR UPDATE row lock vs. GiST EXCLUDE constraint, compared head to head: ~420 req/s vs. ~450-570 req/s at 30 concurrent users, zero overlapping bookings in both',
+      'Scaled to 3 API replicas behind nginx: 10,000 concurrent requests on one slot produced exactly 1 booking and 0 overlaps; a mixed 10,000-request load sustained 321 req/s at 0% unexpected failures (p50 56ms, p95 320ms)',
+      'Idempotency keys via advisory locks, JWT auth with role-based access, and deadlock-retry handling',
+      '66 pytest tests against a real PostgreSQL instance, including a test racing 20 identical requests that asserts exactly one wins',
     ],
     tags: ['Python', 'FastAPI', 'PostgreSQL', 'Docker', 'Locust'],
     github: 'https://github.com/ApparentlyTejas/RoomLock',
@@ -91,6 +92,32 @@ const PROJECTS = [
     ],
     tags: ['Python', 'MCP', 'Monitoring'],
     github: 'https://github.com/ApparentlyTejas/DevPulse',
+  },
+]
+
+const OSS_CONTRIBUTIONS = [
+  {
+    repo: 'dbos-inc/dbos-transact-py',
+    desc: 'Fixed two SQLite concurrency bugs (a shared concurrency budget overspend and transaction write skew) with deterministic tests, and closed a silent migration race where DBOS.migrate() ran without its advisory lock.',
+    prs: [
+      { label: '#943', url: 'https://github.com/dbos-inc/dbos-transact-py/pull/943' },
+      { label: '#958', url: 'https://github.com/dbos-inc/dbos-transact-py/pull/958' },
+    ],
+  },
+  {
+    repo: 'kornia/kornia',
+    desc: 'Rejected non-floating input to two geometry conversions instead of failing silently on bad data.',
+    prs: [{ label: '#6411', url: 'https://github.com/kornia/kornia/pull/6411' }],
+  },
+  {
+    repo: 'uqfoundation/dill',
+    desc: "Fixed check() failing on large objects by piping the payload over stdin instead of hitting the OS argv length limit.",
+    prs: [{ label: '#818', url: 'https://github.com/uqfoundation/dill/pull/818' }],
+  },
+  {
+    repo: 'wills106/homeassistant-solax-modbus',
+    desc: 'Corrected GEN3/GEN4 manufacturer, model number, and register tagging for the X1 Boost G4 / X1 Smart G2 / MIC Gen4 inverters.',
+    prs: [{ label: '#2462', url: 'https://github.com/wills106/homeassistant-solax-modbus/pull/2462' }],
   },
 ]
 
@@ -1245,6 +1272,32 @@ function App() {
             </motion.div>
           ))}
         </StaggerGrid>
+      </Section>
+
+      <Section id="oss">
+        <CommandHeader>$ git log --author=tejas --merged --upstream</CommandHeader>
+        <StaggerGrid className="oss-grid">
+          {OSS_CONTRIBUTIONS.map((c, i) => (
+            <motion.div className="oss-card" key={c.repo} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
+              <div className="project-head">
+                <span className="card-index">{String(i + 1).padStart(2, '0')}</span>
+                <span className="project-category">{c.repo}</span>
+              </div>
+              <p className="project-desc">{c.desc}</p>
+              <div className="project-links">
+                {c.prs.map((pr) => (
+                  <a key={pr.url} href={pr.url} target="_blank" rel="noreferrer">{pr.label} &rarr;</a>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </StaggerGrid>
+        <Reveal className="oss-note">
+          <p>
+            Also licensed <strong>DevPulse</strong> into the XERJ Corpus Hub, an open reference library AI coding
+            agents search before writing code.
+          </p>
+        </Reveal>
       </Section>
 
       <Section id="experience">
