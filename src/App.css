@@ -1215,3 +1215,213 @@ h3 {
     gap: 6px;
   }
 }
+
+/* Isometric project scenes: tiny literal diagrams of what each project does,
+   built from real CSS 3D (preserve-3d + rotateX/rotateY + translateZ). */
+.iso-scene {
+  position: relative;
+  height: 118px;
+  margin: 2px 0 14px;
+  perspective: 820px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.iso-stage {
+  position: relative;
+  width: 140px;
+  height: 80px;
+  transform-style: preserve-3d;
+  transform: rotateX(55deg) rotateZ(45deg);
+}
+
+.iso-ground {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  background-image:
+    linear-gradient(var(--surface-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--surface-border) 1px, transparent 1px);
+  background-size: 15px 15px;
+  background-color: var(--surface);
+  transform: rotateX(90deg) translateZ(0);
+  opacity: 0.7;
+}
+
+.iso-cube {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-style: preserve-3d;
+}
+
+.iso-face {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border: 1px solid rgba(0, 0, 0, 0.32);
+}
+
+/* RoomLock: two requests race a lock; the winner passes through, the loser bounces off. */
+@keyframes iso-race-win {
+  0%, 8% { transform: translate3d(-42px, -10px, 7px); opacity: 1; }
+  45% { transform: translate3d(32px, -10px, 7px); opacity: 1; }
+  52% { transform: translate3d(46px, -10px, 7px); opacity: 0; }
+  53%, 95% { transform: translate3d(-42px, -10px, 7px); opacity: 0; }
+  100% { transform: translate3d(-42px, -10px, 7px); opacity: 1; }
+}
+
+@keyframes iso-race-block {
+  0%, 8% { transform: translate3d(-42px, 10px, 7px); }
+  40% { transform: translate3d(17px, 10px, 7px); }
+  48% { transform: translate3d(22px, 10px, 7px); }
+  56% { transform: translate3d(13px, 10px, 7px); }
+  95% { transform: translate3d(13px, 10px, 7px); }
+  100% { transform: translate3d(-42px, 10px, 7px); }
+}
+
+.iso-race-win {
+  animation: iso-race-win 4.2s ease-in-out infinite;
+}
+
+.iso-race-block {
+  animation: iso-race-block 4.2s ease-in-out infinite;
+}
+
+/* Incident Lens: a role query beams into a hash-chained block tower and lights up the traced one. */
+@keyframes iso-chain-pulse {
+  0%, 35% { filter: brightness(1); }
+  48%, 62% { filter: brightness(1.7); }
+  75%, 100% { filter: brightness(1); }
+}
+
+.iso-chain-target {
+  animation: iso-chain-pulse 3.8s ease-in-out infinite;
+}
+
+@keyframes iso-query-beam {
+  0%, 35% { transform: rotateX(90deg) translate3d(-32px, -14px, 6px) scaleX(0); opacity: 0; }
+  44%, 60% { transform: rotateX(90deg) translate3d(-32px, -14px, 6px) scaleX(1); opacity: 0.9; }
+  70%, 100% { transform: rotateX(90deg) translate3d(-32px, -14px, 6px) scaleX(0); opacity: 0; }
+}
+
+.iso-query-beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 46px;
+  height: 3px;
+  background: var(--accent-orange);
+  transform-origin: left center;
+  animation: iso-query-beam 3.8s ease-in-out infinite;
+}
+
+/* ReviewLenzAI: diff lines flow into the LLM box, ranked severity chips come out. */
+@keyframes iso-diff-flow {
+  0% { transform: translate3d(-10px, var(--iso-y, 0px), 3px); opacity: 1; }
+  38% { transform: translate3d(14px, var(--iso-y, 0px), 3px); opacity: 0.3; }
+  40%, 100% { transform: translate3d(14px, var(--iso-y, 0px), 3px); opacity: 0; }
+}
+
+.iso-diff-line {
+  animation: iso-diff-flow 3.6s ease-in-out infinite;
+}
+
+@keyframes iso-llm-pulse {
+  0%, 30% { transform: scale3d(1, 1, 1); }
+  42% { transform: scale3d(1.08, 1.08, 1.08); }
+  54%, 100% { transform: scale3d(1, 1, 1); }
+}
+
+.iso-llm-pulse {
+  animation: iso-llm-pulse 3.6s ease-in-out infinite;
+}
+
+@keyframes iso-chip-in {
+  0%, 44% { opacity: 0; transform: translate3d(34px, 0px, var(--iso-z, 18px)) scale3d(0.4, 0.4, 0.4); }
+  58%, 100% { opacity: 1; transform: translate3d(34px, 0px, var(--iso-z, 18px)) scale3d(1, 1, 1); }
+}
+
+.iso-chip {
+  animation: iso-chip-in 3.6s ease-in-out infinite;
+}
+
+/* DevPulse: service nodes breathe, a probe travels the trace back to the agent. */
+@keyframes iso-pulse {
+  0%, 100% { opacity: 0.55; transform: scale3d(0.85, 0.85, 0.85); }
+  50% { opacity: 1; transform: scale3d(1.08, 1.08, 1.08); }
+}
+
+.iso-pulse {
+  animation: iso-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes iso-probe {
+  0%, 4% { transform: translate3d(30px, 15px, 5px); }
+  35% { transform: translate3d(30px, 0px, 5px); }
+  65% { transform: translate3d(0px, 0px, 5px); }
+  96%, 100% { transform: translate3d(30px, 15px, 5px); }
+}
+
+.iso-probe {
+  animation: iso-probe 4s linear infinite;
+}
+
+@media (max-width: 860px) {
+  .iso-scene {
+    height: 104px;
+  }
+
+  .iso-stage {
+    transform: rotateX(55deg) rotateZ(45deg) scale(0.82);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iso-race-win,
+  .iso-race-block,
+  .iso-chain-target,
+  .iso-query-beam,
+  .iso-diff-line,
+  .iso-llm-pulse,
+  .iso-chip,
+  .iso-pulse,
+  .iso-probe {
+    animation: none;
+  }
+
+  .iso-race-win {
+    transform: translate3d(32px, -10px, 7px);
+  }
+
+  .iso-race-block {
+    transform: translate3d(17px, 10px, 7px);
+  }
+
+  .iso-chain-target {
+    filter: brightness(1.4);
+  }
+
+  .iso-query-beam {
+    opacity: 0;
+  }
+
+  .iso-diff-line {
+    opacity: 0.3;
+    transform: translate3d(14px, var(--iso-y, 0px), 3px);
+  }
+
+  .iso-chip {
+    opacity: 1;
+    transform: translate3d(34px, 0px, var(--iso-z, 18px)) scale3d(1, 1, 1);
+  }
+
+  .iso-probe {
+    transform: translate3d(0px, 0px, 5px);
+  }
+}

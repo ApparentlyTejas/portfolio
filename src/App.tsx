@@ -574,6 +574,154 @@ function MagneticLink({ className, href, target, rel, children }: {
   )
 }
 
+/* Literal isometric diagrams of what each project actually does, built from
+   real CSS 3D transforms (preserve-3d + rotateX/rotateY/translateZ) — no
+   WebGL, no three.js, no canvas. Each cube is three flat faces sharing one
+   anchor point; the whole stage is tilted once into isometric view. */
+type IsoOrient = 'top' | 'left' | 'front'
+
+function IsoFace({ w, h, color, orient, shade = 1, depth = 0 }: {
+  w: number
+  h: number
+  color: string
+  orient: IsoOrient
+  shade?: number
+  depth?: number
+}) {
+  const rot = orient === 'top' ? 'rotateX(90deg)' : orient === 'left' ? 'rotateY(-90deg)' : ''
+  return (
+    <span
+      className="iso-face"
+      style={{
+        width: w,
+        height: h,
+        marginTop: -h / 2,
+        marginLeft: -w / 2,
+        background: color,
+        filter: shade !== 1 ? `brightness(${shade})` : undefined,
+        transform: `${rot} translateZ(${depth}px)`.trim(),
+      }}
+    />
+  )
+}
+
+function IsoCube({ size = 14, color, className, style }: {
+  size?: number
+  color: string
+  className?: string
+  style?: React.CSSProperties
+}) {
+  const half = size / 2
+  return (
+    <div className={`iso-cube ${className ?? ''}`} style={style}>
+      <IsoFace w={size} h={size} color={color} orient="top" shade={1.2} depth={half} />
+      <IsoFace w={size} h={size} color={color} orient="left" shade={0.64} depth={half} />
+      <IsoFace w={size} h={size} color={color} orient="front" shade={0.92} depth={half} />
+    </div>
+  )
+}
+
+function IsoBar({ x, y, z, w, h, color, orient = 'top', className, style }: {
+  x: number
+  y: number
+  z: number
+  w: number
+  h: number
+  color: string
+  orient?: IsoOrient
+  className?: string
+  style?: React.CSSProperties
+}) {
+  return (
+    <div className={`iso-cube ${className ?? ''}`} style={{ transform: `translate3d(${x}px, ${y}px, ${z}px)`, ...style }}>
+      <IsoFace w={w} h={h} color={color} orient={orient} shade={orient === 'top' ? 1 : 0.8} />
+    </div>
+  )
+}
+
+function RoomLockScene() {
+  return (
+    <>
+      <IsoBar x={0} y={-4} z={1} w={14} h={44} color="var(--accent-blue)" />
+      <IsoCube size={18} color="var(--accent-blue)" style={{ transform: 'translate3d(40px, 0px, 11px)' }} />
+      <IsoCube size={12} color="var(--accent-orange)" className="iso-race-win" />
+      <IsoCube size={12} color="#e85656" className="iso-race-block" />
+    </>
+  )
+}
+
+function IncidentLensScene() {
+  return (
+    <>
+      {[0, 1, 2, 3].map((i) => (
+        <IsoCube
+          key={i}
+          size={14}
+          color="var(--accent-blue)"
+          className={i === 2 ? 'iso-chain-target' : undefined}
+          style={{ transform: `translate3d(10px, 6px, ${i * 14 + 1}px)` }}
+        />
+      ))}
+      <IsoCube size={11} color="var(--accent-orange)" style={{ transform: 'translate3d(-34px, -18px, 6px)' }} />
+      <div className="iso-query-beam" />
+    </>
+  )
+}
+
+function ReviewLensScene() {
+  // The animation keyframes fully own `transform`, so each line/chip's only
+  // per-instance offset (y for lines, z for chips) rides in as a CSS var.
+  const line = (y: number, delay: string) => ({ animationDelay: delay, '--iso-y': `${y}px` }) as React.CSSProperties
+  const chip = (z: number, delay: string) => ({ animationDelay: delay, '--iso-z': `${z}px` }) as React.CSSProperties
+  return (
+    <>
+      <IsoBar x={-10} y={-14} z={3} w={18} h={3} color="#8b93a7" orient="top" className="iso-diff-line" style={line(-14, '0s')} />
+      <IsoBar x={-10} y={0} z={3} w={18} h={3} color="#8b93a7" orient="top" className="iso-diff-line" style={line(0, '0.3s')} />
+      <IsoBar x={-10} y={14} z={3} w={18} h={3} color="#8b93a7" orient="top" className="iso-diff-line" style={line(14, '0.6s')} />
+      <IsoCube size={20} color="var(--accent-blue)" className="iso-llm-pulse" />
+      <IsoCube size={10} color="#e85656" className="iso-chip" style={chip(6, '1.2s')} />
+      <IsoCube size={10} color="var(--accent-orange)" className="iso-chip" style={chip(18, '1.5s')} />
+      <IsoCube size={10} color="#56c285" className="iso-chip" style={chip(30, '1.8s')} />
+    </>
+  )
+}
+
+function DevPulseScene() {
+  return (
+    <>
+      <IsoCube size={16} color="var(--accent-blue)" style={{ transform: 'translate3d(0px, 0px, 8px)' }} />
+      <IsoBar x={-17} y={0} z={2} w={36} h={3} color="var(--surface-border)" />
+      <IsoBar x={0} y={-15} z={2} w={3} h={32} color="var(--surface-border)" />
+      <IsoBar x={15} y={0} z={2} w={32} h={3} color="var(--surface-border)" />
+      <IsoBar x={30} y={7} z={2} w={3} h={16} color="var(--surface-border)" />
+      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(-34px, 0px, 6px)', animationDelay: '0s' }} />
+      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(0px, -30px, 6px)', animationDelay: '0.6s' }} />
+      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(30px, 15px, 6px)', animationDelay: '1.2s' }} />
+      <IsoCube size={6} color="#56c285" className="iso-probe" />
+    </>
+  )
+}
+
+const PROJECT_SCENES: Record<string, () => React.ReactElement> = {
+  'RoomLock': RoomLockScene,
+  'Incident Lens': IncidentLensScene,
+  'ReviewLenzAI': ReviewLensScene,
+  'DevPulse': DevPulseScene,
+}
+
+function ProjectScene({ title }: { title: string }) {
+  const Scene = PROJECT_SCENES[title]
+  if (!Scene) return null
+  return (
+    <div className="iso-scene">
+      <div className="iso-stage">
+        <div className="iso-ground" />
+        <Scene />
+      </div>
+    </div>
+  )
+}
+
 function App() {
   const reduceMotion = useReducedMotion()
   const [booted, setBooted] = useState(false)
@@ -915,6 +1063,7 @@ function App() {
                 <span className="project-category">{p.category}</span>
               </div>
               <h3>{p.title}</h3>
+              <ProjectScene title={p.title} />
               <p className="project-desc">{p.desc}</p>
               <ul className="project-bullets">
                 {p.bullets.map((b) => (
