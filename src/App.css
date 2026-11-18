@@ -1239,6 +1239,8 @@ h3 {
   transform: rotateX(55deg) rotateZ(45deg) scale(2.9);
 }
 
+/* Each project stands on a different floor, so the four scenes read as
+   different places rather than the same cube kit rearranged. */
 .iso-ground {
   position: absolute;
   top: 50%;
@@ -1246,17 +1248,81 @@ h3 {
   width: 150px;
   height: 150px;
   margin: -75px 0 0 -75px;
+  background-color: var(--surface);
+  transform: rotateX(90deg) translateZ(0);
+  opacity: 0.8;
+  /* Fade the floor out toward the edges instead of cutting it off hard —
+     reads like a lit studio floor rather than a tiled texture. */
+  mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
+}
+
+/* RoomLock: a warehouse/garage floor — a literal physical gate stands on it. */
+.iso-ground--grid {
   background-image:
     linear-gradient(var(--surface-border) 1px, transparent 1px),
     linear-gradient(90deg, var(--surface-border) 1px, transparent 1px);
   background-size: 15px 15px;
-  background-color: var(--surface);
-  transform: rotateX(90deg) translateZ(0);
-  opacity: 0.8;
-  /* Fade the grid out toward the edges instead of cutting it off hard —
-     reads like a lit studio floor rather than a tiled texture. */
+}
+
+/* Incident Lens: sparse ledger rows + rack columns, not a dense grid —
+   reads as rows of records, not warehouse tile. */
+.iso-ground--ledger {
+  background-image:
+    linear-gradient(var(--surface-border) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(91, 124, 255, 0.3) 1px, transparent 1px);
+  background-size: 50px 22px;
+}
+
+/* ReviewLenzAI: a diagonal flow field — the diff moving through a pipeline,
+   not a floor you'd stand on. */
+.iso-ground--flow {
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--surface-border) 0,
+    var(--surface-border) 1px,
+    transparent 1px,
+    transparent 16px
+  );
+  background-size: 160px 160px;
+  animation: iso-flow-drift 7s linear infinite;
+}
+
+@keyframes iso-flow-drift {
+  0% { background-position: 0 0; }
+  100% { background-position: 160px 0; }
+}
+
+/* DevPulse: a radar screen, not a floor — concentric rings plus a sweep. */
+.iso-ground--radar {
+  background-image: repeating-radial-gradient(
+    circle at center,
+    var(--surface-border) 0,
+    var(--surface-border) 1px,
+    transparent 1px,
+    transparent 18px
+  );
+  background-size: 100% 100%;
+}
+
+.iso-radar-sweep {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, rgba(86, 194, 133, 0.45), transparent 28%);
+  transform: rotateX(90deg) translateZ(0.5px);
   mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
   -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
+  animation: iso-radar-spin 4s linear infinite;
+}
+
+@keyframes iso-radar-spin {
+  from { transform: rotateX(90deg) translateZ(0.5px) rotate(0deg); }
+  to { transform: rotateX(90deg) translateZ(0.5px) rotate(360deg); }
 }
 
 .iso-cube {
@@ -1408,7 +1474,9 @@ h3 {
   .iso-llm-pulse,
   .iso-chip,
   .iso-pulse,
-  .iso-probe {
+  .iso-probe,
+  .iso-ground--flow,
+  .iso-radar-sweep {
     animation: none;
   }
 

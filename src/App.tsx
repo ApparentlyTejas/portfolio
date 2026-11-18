@@ -675,14 +675,16 @@ function RoomLockScene() {
   )
 }
 
+const CHAIN_BLOCK_COLORS = ['#3a4a8f', 'var(--accent-blue)', '#3a4a8f', 'var(--accent-blue)']
+
 function IncidentLensScene() {
   return (
     <>
-      {[0, 1, 2, 3].map((i) => (
+      {CHAIN_BLOCK_COLORS.map((color, i) => (
         <IsoCube
           key={i}
           size={14}
-          color="var(--accent-blue)"
+          color={color}
           className={i === 2 ? 'iso-chain-target' : undefined}
           style={{ transform: `translate3d(10px, 6px, ${i * 14 + 1}px)` }}
         />
@@ -700,8 +702,10 @@ function ReviewLensScene() {
   const chip = (z: number, delay: string) => ({ animationDelay: delay, '--iso-z': `${z}px` }) as React.CSSProperties
   return (
     <>
-      <IsoBar x={-10} y={-14} z={3} w={18} h={3} color="#8b93a7" orient="top" className="iso-diff-line" style={line(-14, '0s')} />
-      <IsoBar x={-10} y={0} z={3} w={18} h={3} color="#8b93a7" orient="top" className="iso-diff-line" style={line(0, '0.3s')} />
+      {/* Literal git-diff colors: the LLM is reading a removed line, an
+          added line, and a context line — not three generic gray bars. */}
+      <IsoBar x={-10} y={-14} z={3} w={18} h={3} color="#e85656" orient="top" className="iso-diff-line" style={line(-14, '0s')} />
+      <IsoBar x={-10} y={0} z={3} w={18} h={3} color="#56c285" orient="top" className="iso-diff-line" style={line(0, '0.3s')} />
       <IsoBar x={-10} y={14} z={3} w={18} h={3} color="#8b93a7" orient="top" className="iso-diff-line" style={line(14, '0.6s')} />
       <IsoCube size={20} color="var(--accent-blue)" className="iso-llm-pulse" />
       <IsoCube size={10} color="#e85656" className="iso-chip" style={chip(6, '1.2s')} />
@@ -735,13 +739,25 @@ const PROJECT_SCENES: Record<string, () => React.ReactElement> = {
   'DevPulse': DevPulseScene,
 }
 
+// Each project gets its own floor treatment so the four scenes read as
+// different places, not the same cube kit moved around: a warehouse-grid
+// floor for the lock's physical door, a server-rack ledger for the chain,
+// a data-flow streak for the diff pipeline, a radar sweep for live ops.
+const PROJECT_GROUND: Record<string, string> = {
+  'RoomLock': 'iso-ground--grid',
+  'Incident Lens': 'iso-ground--ledger',
+  'ReviewLenzAI': 'iso-ground--flow',
+  'DevPulse': 'iso-ground--radar',
+}
+
 function ProjectScene({ title }: { title: string }) {
   const Scene = PROJECT_SCENES[title]
   if (!Scene) return null
   return (
     <div className="iso-scene">
       <div className="iso-stage">
-        <div className="iso-ground" />
+        <div className={`iso-ground ${PROJECT_GROUND[title] ?? 'iso-ground--grid'}`} />
+        {PROJECT_GROUND[title] === 'iso-ground--radar' && <div className="iso-radar-sweep" />}
         <Scene />
       </div>
     </div>
