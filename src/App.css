@@ -1216,183 +1216,83 @@ h3 {
   }
 }
 
-/* Isometric project scenes: tiny literal diagrams of what each project does,
-   built from real CSS 3D (preserve-3d + rotateX/rotateY + translateZ). */
+/* Isometric project scenes: literal diagrams of what each project does,
+   drawn as true-isometric vector art (SVG polygons from real 30deg/30deg
+   projection math), not CSS 3D div faces — crisp edges, flat per-face
+   shading, real SVG drop shadows, zero WebGL/three.js/canvas. */
 .iso-scene {
   position: relative;
   height: 280px;
   margin: 4px 0 18px;
   padding: 10px;
   border: 1px solid var(--surface-border);
-  /* A much closer camera than before — true isometric has zero perspective
-     convergence, which is exactly why it can read as flat. This pulls in
-     a real vanishing point so depth is unmistakable at a glance. */
-  perspective: 650px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
 }
 
-.iso-stage {
-  position: relative;
-  width: 140px;
-  height: 80px;
-  transform-style: preserve-3d;
-  transform: rotateX(52deg) rotateZ(45deg) scale(2.5);
+.iso-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
-/* Each project stands on a different floor, so the four scenes read as
-   different places rather than the same cube kit rearranged. */
-.iso-ground {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 150px;
-  height: 150px;
-  margin: -75px 0 0 -75px;
-  background-color: var(--surface);
-  transform: rotateX(90deg) translateZ(0);
-  opacity: 0.8;
-  /* Fade the floor out toward the edges instead of cutting it off hard —
-     reads like a lit studio floor rather than a tiled texture. */
-  mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
-  -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
+.iso-shadow {
+  fill: var(--iso-shadow-fill);
 }
 
-/* RoomLock: a warehouse/garage floor — a literal physical gate stands on it. */
-.iso-ground--grid {
-  background-image:
-    linear-gradient(var(--surface-border) 1px, transparent 1px),
-    linear-gradient(90deg, var(--surface-border) 1px, transparent 1px);
-  background-size: 15px 15px;
+.iso-floor-base {
+  fill: var(--surface);
+  opacity: 0.55;
 }
 
-/* Incident Lens: sparse ledger rows + rack columns, not a dense grid —
-   reads as rows of records, not warehouse tile. */
-.iso-ground--ledger {
-  background-image:
-    linear-gradient(var(--surface-border) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(91, 124, 255, 0.3) 1px, transparent 1px);
-  background-size: 50px 22px;
+.iso-floor-lines line {
+  stroke: var(--surface-border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
 }
 
-/* ReviewLenzAI: a diagonal flow field — the diff moving through a pipeline,
-   not a floor you'd stand on. */
-.iso-ground--flow {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    var(--surface-border) 0,
-    var(--surface-border) 1px,
-    transparent 1px,
-    transparent 16px
-  );
-  background-size: 160px 160px;
-  animation: iso-flow-drift 7s linear infinite;
+.iso-floor-row {
+  stroke: rgba(91, 124, 255, 0.35) !important;
 }
 
-@keyframes iso-flow-drift {
-  0% { background-position: 0 0; }
-  100% { background-position: 160px 0; }
+.iso-floor-ring {
+  fill: none;
+  stroke: var(--surface-border);
+  stroke-width: 1;
 }
 
-/* DevPulse: a radar screen, not a floor — concentric rings plus a sweep. */
-.iso-ground--radar {
-  background-image: repeating-radial-gradient(
-    circle at center,
-    var(--surface-border) 0,
-    var(--surface-border) 1px,
-    transparent 1px,
-    transparent 18px
-  );
-  background-size: 100% 100%;
+.iso-radar-wedge {
+  fill: rgba(86, 194, 133, 0.38);
 }
 
 .iso-radar-sweep {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 150px;
-  height: 150px;
-  margin: -75px 0 0 -75px;
-  border-radius: 50%;
-  background: conic-gradient(from 0deg, rgba(86, 194, 133, 0.45), transparent 28%);
-  transform: rotateX(90deg) translateZ(0.5px);
-  mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
-  -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
   animation: iso-radar-spin 4s linear infinite;
 }
 
 @keyframes iso-radar-spin {
-  from { transform: rotateX(90deg) translateZ(0.5px) rotate(0deg); }
-  to { transform: rotateX(90deg) translateZ(0.5px) rotate(360deg); }
-}
-
-.iso-cube {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform-style: preserve-3d;
-}
-
-.iso-face {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.22);
-}
-
-.iso-shadow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  border-radius: 50%;
-  /* The gradient already fades softly on its own — a blur filter here is
-     expensive to composite on an animated, 3D-transformed element and adds
-     nothing a tighter gradient falloff doesn't already give for free. */
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.18) 45%, rgba(0, 0, 0, 0) 75%);
-}
-
-/* Four scenes x ~9 infinite animations each adds up to real continuous
-   compositing work even when a card is nowhere near the viewport. A small
-   IntersectionObserver in ProjectScene toggles this class so only scenes
-   actually on screen keep animating — the rest hold their last frame. */
-.iso-scene:not(.in-view) .iso-race-win,
-.iso-scene:not(.in-view) .iso-race-block,
-.iso-scene:not(.in-view) .iso-chain-target,
-.iso-scene:not(.in-view) .iso-query-beam,
-.iso-scene:not(.in-view) .iso-diff-line,
-.iso-scene:not(.in-view) .iso-llm-pulse,
-.iso-scene:not(.in-view) .iso-chip,
-.iso-scene:not(.in-view) .iso-pulse,
-.iso-scene:not(.in-view) .iso-probe,
-.iso-scene:not(.in-view) .iso-ground--flow,
-.iso-scene:not(.in-view) .iso-radar-sweep {
-  animation-play-state: paused;
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 /* RoomLock: two requests race a lock; the winner passes through, the loser bounces off. */
 @keyframes iso-race-win {
-  0%, 8% { transform: translate3d(-42px, -10px, 7px); opacity: 1; }
-  45% { transform: translate3d(32px, -10px, 7px); opacity: 1; }
-  52% { transform: translate3d(46px, -10px, 7px); opacity: 0; }
-  53%, 95% { transform: translate3d(-42px, -10px, 7px); opacity: 0; }
-  100% { transform: translate3d(-42px, -10px, 7px); opacity: 1; }
-}
-
-@keyframes iso-race-block {
-  0%, 8% { transform: translate3d(-42px, 10px, 7px); }
-  40% { transform: translate3d(17px, 10px, 7px); }
-  48% { transform: translate3d(22px, 10px, 7px); }
-  56% { transform: translate3d(13px, 10px, 7px); }
-  95% { transform: translate3d(13px, 10px, 7px); }
-  100% { transform: translate3d(-42px, 10px, 7px); }
+  0%, 8% { transform: translate(-27.71px, -27px); opacity: 1; }
+  45% { transform: translate(36.37px, 10px); opacity: 1; }
+  52% { transform: translate(48.5px, 17px); opacity: 0; }
+  53%, 95% { transform: translate(-27.71px, -27px); opacity: 0; }
+  100% { transform: translate(-27.71px, -27px); opacity: 1; }
 }
 
 .iso-race-win {
   animation: iso-race-win 4.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes iso-race-block {
+  0%, 8% { transform: translate(-45.03px, -17px); }
+  40% { transform: translate(6.06px, 12.5px); }
+  48% { transform: translate(10.39px, 15px); }
+  56% { transform: translate(2.6px, 10.5px); }
+  95% { transform: translate(2.6px, 10.5px); }
+  100% { transform: translate(-45.03px, -17px); }
 }
 
 .iso-race-block {
@@ -1400,78 +1300,109 @@ h3 {
 }
 
 /* Incident Lens: a role query beams into a hash-chained block tower and lights up the traced one. */
-@keyframes iso-chain-pulse {
-  0%, 35% { filter: brightness(1); }
-  48%, 62% { filter: brightness(1.7); }
-  75%, 100% { filter: brightness(1); }
-}
-
 .iso-chain-target {
   animation: iso-chain-pulse 3.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-@keyframes iso-query-beam {
-  0%, 35% { transform: rotateX(90deg) translate3d(-32px, -14px, 6px) scaleX(0); opacity: 0; }
-  44%, 60% { transform: rotateX(90deg) translate3d(-32px, -14px, 6px) scaleX(1); opacity: 0.9; }
-  70%, 100% { transform: rotateX(90deg) translate3d(-32px, -14px, 6px) scaleX(0); opacity: 0; }
+@keyframes iso-chain-pulse {
+  0%, 35% { filter: brightness(1); }
+  48%, 62% { filter: brightness(1.6); }
+  75%, 100% { filter: brightness(1); }
 }
 
 .iso-query-beam {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 46px;
-  height: 3px;
-  background: var(--accent-blue);
+  transform-box: fill-box;
   transform-origin: left center;
   animation: iso-query-beam 3.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
+@keyframes iso-query-beam {
+  0%, 35% { transform: scaleX(0); opacity: 0; }
+  44%, 60% { transform: scaleX(1); opacity: 0.9; }
+  70%, 100% { transform: scaleX(0); opacity: 0; }
+}
+
 /* ReviewLenzAI: diff lines flow into the LLM box, ranked severity chips come out. */
-@keyframes iso-diff-flow {
-  0% { transform: translate3d(-10px, var(--iso-y, 0px), 3px); opacity: 1; }
-  38% { transform: translate3d(14px, var(--iso-y, 0px), 3px); opacity: 0.3; }
-  40%, 100% { transform: translate3d(14px, var(--iso-y, 0px), 3px); opacity: 0; }
+.iso-diff-1, .iso-diff-2, .iso-diff-3 {
+  transform-box: fill-box;
 }
 
-.iso-diff-line {
-  animation: iso-diff-flow 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+@keyframes iso-diff-1 {
+  0% { transform: translate(3.46px, -13px); opacity: 1; }
+  38% { transform: translate(24.25px, -1px); opacity: 0.3; }
+  40%, 100% { transform: translate(24.25px, -1px); opacity: 0; }
 }
 
-@keyframes iso-llm-pulse {
-  0%, 30% { transform: scale3d(1, 1, 1); }
-  42% { transform: scale3d(1.08, 1.08, 1.08); }
-  54%, 100% { transform: scale3d(1, 1, 1); }
+.iso-diff-1 {
+  animation: iso-diff-1 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes iso-diff-2 {
+  0% { transform: translate(-8.66px, -6px); opacity: 1; }
+  38% { transform: translate(12.12px, 6px); opacity: 0.3; }
+  40%, 100% { transform: translate(12.12px, 6px); opacity: 0; }
+}
+
+.iso-diff-2 {
+  animation: iso-diff-2 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes iso-diff-3 {
+  0% { transform: translate(-20.78px, 1px); opacity: 1; }
+  38% { transform: translate(0px, 13px); opacity: 0.3; }
+  40%, 100% { transform: translate(0px, 13px); opacity: 0; }
+}
+
+.iso-diff-3 {
+  animation: iso-diff-3 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 .iso-llm-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
   animation: iso-llm-pulse 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-@keyframes iso-chip-in {
-  0%, 44% { opacity: 0; transform: translate3d(34px, 0px, var(--iso-z, 18px)) scale3d(0.4, 0.4, 0.4); }
-  58%, 100% { opacity: 1; transform: translate3d(34px, 0px, var(--iso-z, 18px)) scale3d(1, 1, 1); }
+@keyframes iso-llm-pulse {
+  0%, 30% { transform: scale(1); }
+  42% { transform: scale(1.08); }
+  54%, 100% { transform: scale(1); }
 }
 
 .iso-chip {
+  transform-box: fill-box;
+  transform-origin: center;
   animation: iso-chip-in 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
+@keyframes iso-chip-in {
+  0%, 44% { opacity: 0; transform: scale(0.4); }
+  58%, 100% { opacity: 1; transform: scale(1); }
+}
+
 /* DevPulse: service nodes breathe, a probe travels the trace back to the agent. */
-@keyframes iso-pulse {
-  0%, 100% { opacity: 0.55; transform: scale3d(0.85, 0.85, 0.85); }
-  50% { opacity: 1; transform: scale3d(1.08, 1.08, 1.08); }
+.iso-trace {
+  fill: none;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
 }
 
 .iso-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
   animation: iso-pulse 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
+@keyframes iso-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
 @keyframes iso-probe {
-  0%, 4% { transform: translate3d(45px, 22px, 5px); }
-  35% { transform: translate3d(45px, 0px, 5px); }
-  65% { transform: translate3d(0px, 0px, 5px); }
-  96%, 100% { transform: translate3d(45px, 22px, 5px); }
+  0%, 4% { transform: translate(19.92px, 31.5px); }
+  35% { transform: translate(38.97px, 20.5px); }
+  65% { transform: translate(0px, -2px); }
+  96%, 100% { transform: translate(19.92px, 31.5px); }
 }
 
 .iso-probe {
@@ -1482,10 +1413,6 @@ h3 {
   .iso-scene {
     height: 230px;
   }
-
-  .iso-stage {
-    transform: rotateX(52deg) rotateZ(45deg) scale(2.0);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1493,43 +1420,67 @@ h3 {
   .iso-race-block,
   .iso-chain-target,
   .iso-query-beam,
-  .iso-diff-line,
+  .iso-diff-1,
+  .iso-diff-2,
+  .iso-diff-3,
   .iso-llm-pulse,
   .iso-chip,
   .iso-pulse,
   .iso-probe,
-  .iso-ground--flow,
   .iso-radar-sweep {
     animation: none;
   }
 
   .iso-race-win {
-    transform: translate3d(32px, -10px, 7px);
+    transform: translate(36.37px, 10px);
   }
 
   .iso-race-block {
-    transform: translate3d(17px, 10px, 7px);
-  }
-
-  .iso-chain-target {
-    filter: brightness(1.4);
+    transform: translate(6.06px, 12.5px);
   }
 
   .iso-query-beam {
     opacity: 0;
   }
 
-  .iso-diff-line {
+  .iso-diff-1 {
     opacity: 0.3;
-    transform: translate3d(14px, var(--iso-y, 0px), 3px);
+    transform: translate(24.25px, -1px);
+  }
+
+  .iso-diff-2 {
+    opacity: 0.3;
+    transform: translate(12.12px, 6px);
+  }
+
+  .iso-diff-3 {
+    opacity: 0.3;
+    transform: translate(0px, 13px);
   }
 
   .iso-chip {
     opacity: 1;
-    transform: translate3d(34px, 0px, var(--iso-z, 18px)) scale3d(1, 1, 1);
+    transform: scale(1);
   }
 
   .iso-probe {
-    transform: translate3d(0px, 0px, 5px);
+    transform: translate(0px, -2px);
   }
+}
+
+/* Only scenes actually scrolled into view keep animating — the rest hold
+   their last frame, via the IntersectionObserver in ProjectScene. */
+.iso-svg:not(.in-view) .iso-race-win,
+.iso-svg:not(.in-view) .iso-race-block,
+.iso-svg:not(.in-view) .iso-chain-target,
+.iso-svg:not(.in-view) .iso-query-beam,
+.iso-svg:not(.in-view) .iso-diff-1,
+.iso-svg:not(.in-view) .iso-diff-2,
+.iso-svg:not(.in-view) .iso-diff-3,
+.iso-svg:not(.in-view) .iso-llm-pulse,
+.iso-svg:not(.in-view) .iso-chip,
+.iso-svg:not(.in-view) .iso-pulse,
+.iso-svg:not(.in-view) .iso-probe,
+.iso-svg:not(.in-view) .iso-radar-sweep {
+  animation-play-state: paused;
 }

@@ -579,164 +579,118 @@ function MagneticLink({ className, href, target, rel, children }: {
   )
 }
 
-/* Literal isometric diagrams of what each project actually does, built from
-   real CSS 3D transforms (preserve-3d + rotateX/rotateY/translateZ) — no
-   WebGL, no three.js, no canvas. Each cube is three flat faces sharing one
-   anchor point; the whole stage is tilted once into isometric view. */
-type IsoOrient = 'top' | 'left' | 'front'
+/* Literal isometric diagrams of what each project actually does, drawn as
+   real vector art — not CSS div faces. Every point is a true isometric
+   projection (30°/30°) of a 3D world coordinate, so cubes are crisp filled
+   polygons with gradient-free flat shading per face, proper drop shadows
+   via an SVG filter, and zero WebGL/three.js/canvas. */
+const COS30 = Math.cos(Math.PI / 6)
+const SIN30 = Math.sin(Math.PI / 6)
 
-function IsoFace({ w, h, color, orient, shade = 1, depth = 0 }: {
-  w: number
-  h: number
-  color: string
-  orient: IsoOrient
-  shade?: number
-  depth?: number
-}) {
-  const rot = orient === 'top' ? 'rotateX(90deg)' : orient === 'left' ? 'rotateY(-90deg)' : ''
-  // A soft diagonal sheen plus a falloff toward the far corner, layered over
-  // the flat shade, so each face reads as lit material instead of a solid
-  // swatch — the thing that actually sells "rendered" over "colored box."
-  const sheen = orient === 'top'
-    ? 'linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0) 60%)'
-    : orient === 'left'
-      ? 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(0,0,0,0.12) 75%)'
-      : 'linear-gradient(135deg, rgba(255,255,255,0.22), rgba(0,0,0,0.05) 70%)'
-  return (
-    <span
-      className="iso-face"
-      style={{
-        width: w,
-        height: h,
-        marginTop: -h / 2,
-        marginLeft: -w / 2,
-        background: `${sheen}, ${color}`,
-        filter: shade !== 1 ? `brightness(${shade})` : undefined,
-        transform: `${rot} translateZ(${depth}px)`.trim(),
-      }}
-    />
-  )
+function iso(x: number, y: number, z: number) {
+  return { x: (x - y) * COS30, y: (x + y) * SIN30 - z }
 }
 
-function IsoShadow({ size, depth }: { size: number; depth: number }) {
-  return (
-    <span
-      className="iso-shadow"
-      style={{
-        width: size,
-        height: size,
-        marginTop: -size / 2,
-        marginLeft: -size / 2,
-        transform: `rotateX(90deg) translateZ(${-depth}px)`,
-      }}
-    />
-  )
+function pts(coords: Array<[number, number, number]>) {
+  return coords.map(([x, y, z]) => { const p = iso(x, y, z); return `${p.x.toFixed(2)},${p.y.toFixed(2)}` }).join(' ')
 }
 
-function IsoCube({ size = 14, color, className, style, shadow = true }: {
-  size?: number
+type Shade = [top: number, right: number, front: number]
+const DEFAULT_SHADE: Shade = [1.4, 0.42, 0.8]
+
+// A box sitting on the ground: its base is at local z=0 (the group's own
+// translate places that base point), and it extends up by `h`. Three faces,
+// three flat shades — no gradients, no filters beyond brightness, so edges
+// stay perfectly crisp at any size instead of the soft div-border look.
+function IsoBox({ w = 14, d = 14, h = 14, color, shade = DEFAULT_SHADE, shadow = true, className, style }: {
+  w?: number
+  d?: number
+  h?: number
   color: string
-  className?: string
-  style?: React.CSSProperties
+  shade?: Shade
   shadow?: boolean
-}) {
-  const half = size / 2
-  return (
-    <div className={`iso-cube ${className ?? ''}`} style={style}>
-      {shadow && <IsoShadow size={size * 1.5} depth={half} />}
-      <IsoFace w={size} h={size} color={color} orient="top" shade={1.4} depth={half} />
-      <IsoFace w={size} h={size} color={color} orient="left" shade={0.42} depth={half} />
-      <IsoFace w={size} h={size} color={color} orient="front" shade={0.8} depth={half} />
-    </div>
-  )
-}
-
-function IsoBar({ x, y, z, w, h, color, orient = 'top', className, style }: {
-  x: number
-  y: number
-  z: number
-  w: number
-  h: number
-  color: string
-  orient?: IsoOrient
   className?: string
   style?: React.CSSProperties
 }) {
+  const hw = w / 2
+  const hd = d / 2
   return (
-    <div className={`iso-cube ${className ?? ''}`} style={{ transform: `translate3d(${x}px, ${y}px, ${z}px)`, ...style }}>
-      <IsoFace w={w} h={h} color={color} orient={orient} shade={orient === 'top' ? 1 : 0.8} />
-    </div>
+    <g className={className} style={style}>
+      {shadow && (
+        <ellipse className="iso-shadow" cx={0} cy={0} rx={Math.max(w, d) * 0.62} ry={Math.max(w, d) * 0.32} />
+      )}
+      <polygon points={pts([[-hw, hd, h], [hw, hd, h], [hw, hd, 0], [-hw, hd, 0]])} fill={color} style={{ filter: `brightness(${shade[2]})` }} />
+      <polygon points={pts([[hw, -hd, h], [hw, hd, h], [hw, hd, 0], [hw, -hd, 0]])} fill={color} style={{ filter: `brightness(${shade[1]})` }} />
+      <polygon points={pts([[-hw, -hd, h], [hw, -hd, h], [hw, hd, h], [-hw, hd, h]])} fill={color} style={{ filter: `brightness(${shade[0]})` }} />
+    </g>
   )
 }
+
+const T = (x: number, y: number) => ({ transform: `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)` })
 
 function RoomLockScene() {
   return (
     <>
-      <IsoBar x={0} y={-4} z={1} w={14} h={44} color="var(--accent-blue)" />
-      <IsoCube size={18} color="var(--accent-blue)" style={{ transform: 'translate3d(40px, 0px, 11px)' }} />
-      <IsoCube size={12} color="var(--accent-orange)" className="iso-race-win" />
-      <IsoCube size={12} color="#e85656" className="iso-race-block" />
+      <IsoBox w={20} d={6} h={24} color="var(--accent-blue)" style={T(34.64, 20)} />
+      <g className="iso-race-win"><IsoBox w={12} d={12} h={12} color="var(--accent-orange)" /></g>
+      <g className="iso-race-block"><IsoBox w={12} d={12} h={12} color="#e85656" /></g>
     </>
   )
 }
 
 // Amber/gold dominant, not blue — distinct from RoomLock's blue door and
 // DevPulse's blue agent so the four scenes don't all read as "blue cube."
-const CHAIN_BLOCK_COLORS = ['#8a6a1f', 'var(--accent-orange)', '#8a6a1f', 'var(--accent-orange)']
+const CHAIN_BLOCK_COLORS = ['#8a6a1f', '#d99a2b', '#8a6a1f', '#d99a2b']
 
 function IncidentLensScene() {
+  const base = iso(10, 6, 0)
   return (
     <>
       {CHAIN_BLOCK_COLORS.map((color, i) => (
-        <IsoCube
-          key={i}
-          size={14}
-          color={color}
-          className={i === 2 ? 'iso-chain-target' : undefined}
-          style={{ transform: `translate3d(10px, 6px, ${i * 14 + 1}px)` }}
-        />
+        <g key={i} className={i === 2 ? 'iso-chain-target' : undefined} style={T(base.x, base.y - i * 14)}>
+          <IsoBox w={14} d={14} h={14} color={color} shadow={i === 0} />
+        </g>
       ))}
-      <IsoCube size={11} color="var(--accent-blue)" style={{ transform: 'translate3d(-34px, -18px, 6px)' }} />
-      <div className="iso-query-beam" />
+      <IsoBox w={11} d={11} h={11} color="var(--accent-blue)" style={T(-13.86, -26.5)} />
+      <g style={T(-15.59, -29)}>
+        <g transform="rotate(30)">
+          <rect className="iso-query-beam" x={0} y={-1.5} width={46} height={3} fill="var(--accent-blue)" />
+        </g>
+      </g>
     </>
   )
 }
 
 function ReviewLensScene() {
-  // The animation keyframes fully own `transform`, so each line/chip's only
-  // per-instance offset (y for lines, z for chips) rides in as a CSS var.
-  const line = (y: number, delay: string) => ({ animationDelay: delay, '--iso-y': `${y}px` }) as React.CSSProperties
-  const chip = (z: number, delay: string) => ({ animationDelay: delay, '--iso-z': `${z}px` }) as React.CSSProperties
+  // Literal git-diff colors: the LLM is reading a removed line, an added
+  // line, and a context line — not three generic gray bars.
   return (
     <>
-      {/* Literal git-diff colors: the LLM is reading a removed line, an
-          added line, and a context line — not three generic gray bars. */}
-      <IsoBar x={-10} y={-14} z={3} w={18} h={3} color="#e85656" orient="top" className="iso-diff-line" style={line(-14, '0s')} />
-      <IsoBar x={-10} y={0} z={3} w={18} h={3} color="#56c285" orient="top" className="iso-diff-line" style={line(0, '0.3s')} />
-      <IsoBar x={-10} y={14} z={3} w={18} h={3} color="#8b93a7" orient="top" className="iso-diff-line" style={line(14, '0.6s')} />
+      <rect className="iso-diff-1" x={-1.5} y={-1.2} width={18} height={2.4} fill="#e85656" />
+      <rect className="iso-diff-2" x={-1.5} y={-1.2} width={18} height={2.4} fill="#56c285" style={{ animationDelay: '0.3s' }} />
+      <rect className="iso-diff-3" x={-1.5} y={-1.2} width={18} height={2.4} fill="#8b93a7" style={{ animationDelay: '0.6s' }} />
       {/* Violet, not blue — this is the one scene about an LLM, so it gets
           its own color instead of reusing the door/agent/role-cube blue. */}
-      <IsoCube size={20} color="#9a7bd9" className="iso-llm-pulse" />
-      <IsoCube size={10} color="#e85656" className="iso-chip" style={chip(6, '1.2s')} />
-      <IsoCube size={10} color="var(--accent-orange)" className="iso-chip" style={chip(18, '1.5s')} />
-      <IsoCube size={10} color="#56c285" className="iso-chip" style={chip(30, '1.8s')} />
+      <IsoBox w={20} d={20} h={20} color="#9a7bd9" className="iso-llm-pulse" />
+      <g style={T(29.44, 16)}><g className="iso-chip" style={{ animationDelay: '1.2s' }}><IsoBox w={10} d={10} h={10} color="#e85656" /></g></g>
+      <g style={T(29.44, 4)}><g className="iso-chip" style={{ animationDelay: '1.5s' }}><IsoBox w={10} d={10} h={10} color="var(--accent-orange)" /></g></g>
+      <g style={T(29.44, -8)}><g className="iso-chip" style={{ animationDelay: '1.8s' }}><IsoBox w={10} d={10} h={10} color="#56c285" /></g></g>
     </>
   )
 }
 
 function DevPulseScene() {
-  const trace = 'rgba(91, 124, 255, 0.4)'
+  const trace = 'rgba(91, 124, 255, 0.45)'
   return (
     <>
-      <IsoCube size={16} color="var(--accent-blue)" style={{ transform: 'translate3d(0px, 0px, 8px)' }} />
-      <IsoBar x={-25} y={0} z={2} w={50} h={3} color={trace} />
-      <IsoBar x={0} y={-22} z={2} w={3} h={46} color={trace} />
-      <IsoBar x={22} y={0} z={2} w={46} h={3} color={trace} />
-      <IsoBar x={45} y={11} z={2} w={3} h={24} color={trace} />
-      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(-50px, 0px, 6px)', animationDelay: '0s' }} />
-      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(0px, -45px, 6px)', animationDelay: '0.6s' }} />
-      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(45px, 22px, 6px)', animationDelay: '1.2s' }} />
-      <IsoCube size={6} color="#56c285" className="iso-probe" />
+      <polyline className="iso-trace" points={pts([[-50, 0, 1], [0, 0, 1]])} stroke={trace} />
+      <polyline className="iso-trace" points={pts([[0, -45, 1], [0, 0, 1]])} stroke={trace} />
+      <polyline className="iso-trace" points={pts([[45, 22, 1], [45, 0, 1], [0, 0, 1]])} stroke={trace} />
+      <IsoBox w={16} d={16} h={16} color="var(--accent-blue)" />
+      <g style={T(-43.3, -25.5)}><g className="iso-pulse" style={{ animationDelay: '0s' }}><IsoBox w={11} d={11} h={11} color="var(--accent-orange)" /></g></g>
+      <g style={T(38.97, -23)}><g className="iso-pulse" style={{ animationDelay: '0.6s' }}><IsoBox w={11} d={11} h={11} color="var(--accent-orange)" /></g></g>
+      <g style={T(19.92, 33)}><g className="iso-pulse" style={{ animationDelay: '1.2s' }}><IsoBox w={11} d={11} h={11} color="var(--accent-orange)" /></g></g>
+      <g className="iso-probe"><IsoBox w={6} d={6} h={6} color="#56c285" shadow={false} /></g>
     </>
   )
 }
@@ -748,21 +702,79 @@ const PROJECT_SCENES: Record<string, () => React.ReactElement> = {
   'DevPulse': DevPulseScene,
 }
 
-// Each project gets its own floor treatment so the four scenes read as
-// different places, not the same cube kit moved around: a warehouse-grid
-// floor for the lock's physical door, a server-rack ledger for the chain,
-// a data-flow streak for the diff pipeline, a radar sweep for live ops.
+const FLOOR_EXTENT = 80
+
+function floorRing(r: number) {
+  const coords: Array<[number, number, number]> = []
+  for (let i = 0; i <= 48; i++) {
+    const a = (i / 48) * Math.PI * 2
+    coords.push([r * Math.cos(a), r * Math.sin(a), 0])
+  }
+  return pts(coords)
+}
+
+// Each project stands on a different floor so the four scenes read as
+// different places, not the same kit moved around: a warehouse-grid floor
+// for the lock's physical door, sparse ledger rows for the chain, a
+// diagonal flow field for the diff pipeline, a radar screen for live ops.
+function IsoFloor({ variant, uid }: { variant: string; uid: string }) {
+  const diamond = pts([[-FLOOR_EXTENT, -FLOOR_EXTENT, 0], [FLOOR_EXTENT, -FLOOR_EXTENT, 0], [FLOOR_EXTENT, FLOOR_EXTENT, 0], [-FLOOR_EXTENT, FLOOR_EXTENT, 0]])
+  const lines: React.ReactElement[] = []
+
+  if (variant === 'grid') {
+    for (let v = -FLOOR_EXTENT; v <= FLOOR_EXTENT; v += 16) {
+      const a = iso(-FLOOR_EXTENT, v, 0), b = iso(FLOOR_EXTENT, v, 0)
+      lines.push(<line key={`x${v}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} />)
+      const c = iso(v, -FLOOR_EXTENT, 0), d = iso(v, FLOOR_EXTENT, 0)
+      lines.push(<line key={`y${v}`} x1={c.x} y1={c.y} x2={d.x} y2={d.y} />)
+    }
+  } else if (variant === 'ledger') {
+    for (let v = -FLOOR_EXTENT; v <= FLOOR_EXTENT; v += 40) {
+      const a = iso(v, -FLOOR_EXTENT, 0), b = iso(v, FLOOR_EXTENT, 0)
+      lines.push(<line key={`c${v}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} />)
+    }
+    for (let v = -FLOOR_EXTENT; v <= FLOOR_EXTENT; v += 20) {
+      const a = iso(-FLOOR_EXTENT, v, 0), b = iso(FLOOR_EXTENT, v, 0)
+      lines.push(<line key={`r${v}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} className="iso-floor-row" />)
+    }
+  } else if (variant === 'flow') {
+    for (let v = -FLOOR_EXTENT; v <= FLOOR_EXTENT; v += 14) {
+      const a = iso(v, -FLOOR_EXTENT, 0), b = iso(v, FLOOR_EXTENT, 0)
+      lines.push(<line key={`f${v}`} x1={a.x} y1={a.y} x2={b.x} y2={b.y} />)
+    }
+  }
+
+  return (
+    <g mask={`url(#isoFade-${uid})`}>
+      <polygon points={diamond} className="iso-floor-base" />
+      {variant === 'radar' ? (
+        <>
+          {[26, 46, 66].map((r) => (
+            <polygon key={r} points={floorRing(r)} className="iso-floor-ring" />
+          ))}
+          <g className="iso-radar-sweep" style={{ transformOrigin: '0px 0px' }}>
+            <polygon points={`0,0 ${floorRing(66).split(' ').slice(0, 7).join(' ')}`} className="iso-radar-wedge" />
+          </g>
+        </>
+      ) : (
+        <g className="iso-floor-lines">{lines}</g>
+      )}
+    </g>
+  )
+}
+
 const PROJECT_GROUND: Record<string, string> = {
-  'RoomLock': 'iso-ground--grid',
-  'Incident Lens': 'iso-ground--ledger',
-  'ReviewLenzAI': 'iso-ground--flow',
-  'DevPulse': 'iso-ground--radar',
+  'RoomLock': 'grid',
+  'Incident Lens': 'ledger',
+  'ReviewLenzAI': 'flow',
+  'DevPulse': 'radar',
 }
 
 function ProjectScene({ title }: { title: string }) {
   const Scene = PROJECT_SCENES[title]
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<SVGSVGElement>(null)
   const [inView, setInView] = useState(false)
+  const uid = useMemo(() => title.replace(/\s+/g, '-').toLowerCase(), [title])
 
   useEffect(() => {
     const el = ref.current
@@ -776,13 +788,29 @@ function ProjectScene({ title }: { title: string }) {
   }, [])
 
   if (!Scene) return null
+  const variant = PROJECT_GROUND[title] ?? 'grid'
   return (
-    <div ref={ref} className={`iso-scene ${inView ? 'in-view' : ''}`}>
-      <div className="iso-stage">
-        <div className={`iso-ground ${PROJECT_GROUND[title] ?? 'iso-ground--grid'}`} />
-        {PROJECT_GROUND[title] === 'iso-ground--radar' && <div className="iso-radar-sweep" />}
-        <Scene />
-      </div>
+    <div className="iso-scene">
+      <svg ref={ref} className={`iso-svg ${inView ? 'in-view' : ''}`} viewBox="-150 -95 300 195" aria-hidden="true">
+        <defs>
+          <radialGradient id={`isoFadeGrad-${uid}`}>
+            <stop offset="35%" stopColor="#fff" />
+            <stop offset="75%" stopColor="#000" />
+          </radialGradient>
+          <mask id={`isoFade-${uid}`}>
+            <rect x={-150} y={-100} width={300} height={200} fill={`url(#isoFadeGrad-${uid})`} />
+          </mask>
+          <radialGradient id={`isoShadowGrad-${uid}`}>
+            <stop offset="0%" stopColor="#000" stopOpacity="0.45" />
+            <stop offset="45%" stopColor="#000" stopOpacity="0.18" />
+            <stop offset="100%" stopColor="#000" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+        <g style={{ '--iso-shadow-fill': `url(#isoShadowGrad-${uid})` } as React.CSSProperties}>
+          <IsoFloor variant={variant} uid={uid} />
+          <Scene />
+        </g>
+      </svg>
     </div>
   )
 }
