@@ -1299,62 +1299,29 @@ h3 {
   animation: iso-race-block 4.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-/* Incident Lens: a role query beams into a hash-chained block tower and lights up the traced one. */
+/* Incident Lens: a fanned stack of evidence pages, one lit up as the entry
+   a role query actually traced to, with a magnifying glass verifying it. */
 .iso-chain-target {
   animation: iso-chain-pulse 3.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 @keyframes iso-chain-pulse {
   0%, 35% { filter: brightness(1); }
-  48%, 62% { filter: brightness(1.6); }
+  48%, 62% { filter: brightness(1.5); }
   75%, 100% { filter: brightness(1); }
 }
 
-.iso-query-beam {
-  transform-box: fill-box;
-  transform-origin: left center;
-  animation: iso-query-beam 3.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-@keyframes iso-query-beam {
-  0%, 35% { transform: scaleX(0); opacity: 0; }
-  44%, 60% { transform: scaleX(1); opacity: 0.9; }
-  70%, 100% { transform: scaleX(0); opacity: 0; }
-}
-
-/* ReviewLenzAI: diff lines flow into the LLM box, ranked severity chips come out. */
+/* ReviewLenzAI: a real diff panel whose +/- lines reveal one at a time as
+   the LLM reads them, then severity-ranked chips pop out the other side. */
 .iso-diff-1, .iso-diff-2, .iso-diff-3 {
   transform-box: fill-box;
+  transform-origin: left center;
+  animation: iso-diff-reveal 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-@keyframes iso-diff-1 {
-  0% { transform: translate(3.46px, -13px); opacity: 1; }
-  38% { transform: translate(24.25px, -1px); opacity: 0.3; }
-  40%, 100% { transform: translate(24.25px, -1px); opacity: 0; }
-}
-
-.iso-diff-1 {
-  animation: iso-diff-1 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-@keyframes iso-diff-2 {
-  0% { transform: translate(-8.66px, -6px); opacity: 1; }
-  38% { transform: translate(12.12px, 6px); opacity: 0.3; }
-  40%, 100% { transform: translate(12.12px, 6px); opacity: 0; }
-}
-
-.iso-diff-2 {
-  animation: iso-diff-2 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
-}
-
-@keyframes iso-diff-3 {
-  0% { transform: translate(-20.78px, 1px); opacity: 1; }
-  38% { transform: translate(0px, 13px); opacity: 0.3; }
-  40%, 100% { transform: translate(0px, 13px); opacity: 0; }
-}
-
-.iso-diff-3 {
-  animation: iso-diff-3 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+@keyframes iso-diff-reveal {
+  0%, 10% { opacity: 0; transform: scaleX(0); }
+  28%, 100% { opacity: 1; transform: scaleX(1); }
 }
 
 .iso-llm-pulse {
@@ -1365,7 +1332,7 @@ h3 {
 
 @keyframes iso-llm-pulse {
   0%, 30% { transform: scale(1); }
-  42% { transform: scale(1.08); }
+  42% { transform: scale(1.1); }
   54%, 100% { transform: scale(1); }
 }
 
@@ -1380,13 +1347,8 @@ h3 {
   58%, 100% { opacity: 1; transform: scale(1); }
 }
 
-/* DevPulse: service nodes breathe, a probe travels the trace back to the agent. */
-.iso-trace {
-  fill: none;
-  stroke-width: 2;
-  vector-effect: non-scaling-stroke;
-}
-
+/* Reused for any gentle scale-and-fade breathing: the Incident Lens
+   magnifying glass, DevPulse's status lights. */
 .iso-pulse {
   transform-box: fill-box;
   transform-origin: center;
@@ -1398,15 +1360,26 @@ h3 {
   50% { opacity: 1; transform: scale(1.08); }
 }
 
-@keyframes iso-probe {
-  0%, 4% { transform: translate(19.92px, 31.5px); }
-  35% { transform: translate(38.97px, 20.5px); }
-  65% { transform: translate(0px, -2px); }
-  96%, 100% { transform: translate(19.92px, 31.5px); }
+/* DevPulse: a real heartbeat trace drawing itself across the monitor, and
+   a dashed line showing the agent actively polling it. */
+.iso-heartbeat {
+  stroke-dasharray: 76;
+  animation: iso-heartbeat-draw 2.4s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
-.iso-probe {
-  animation: iso-probe 4s linear infinite;
+@keyframes iso-heartbeat-draw {
+  0% { stroke-dashoffset: 76; }
+  65%, 100% { stroke-dashoffset: 0; }
+}
+
+.iso-poll-line {
+  stroke-dashoffset: 8;
+  animation: iso-poll-flow 1s linear infinite;
+}
+
+@keyframes iso-poll-flow {
+  from { stroke-dashoffset: 8; }
+  to { stroke-dashoffset: 0; }
 }
 
 @media (max-width: 860px) {
@@ -1419,14 +1392,14 @@ h3 {
   .iso-race-win,
   .iso-race-block,
   .iso-chain-target,
-  .iso-query-beam,
   .iso-diff-1,
   .iso-diff-2,
   .iso-diff-3,
   .iso-llm-pulse,
   .iso-chip,
   .iso-pulse,
-  .iso-probe,
+  .iso-heartbeat,
+  .iso-poll-line,
   .iso-radar-sweep {
     animation: none;
   }
@@ -1439,23 +1412,11 @@ h3 {
     transform: translate(6.06px, 12.5px);
   }
 
-  .iso-query-beam {
-    opacity: 0;
-  }
-
-  .iso-diff-1 {
-    opacity: 0.3;
-    transform: translate(24.25px, -1px);
-  }
-
-  .iso-diff-2 {
-    opacity: 0.3;
-    transform: translate(12.12px, 6px);
-  }
-
+  .iso-diff-1,
+  .iso-diff-2,
   .iso-diff-3 {
-    opacity: 0.3;
-    transform: translate(0px, 13px);
+    opacity: 1;
+    transform: scaleX(1);
   }
 
   .iso-chip {
@@ -1463,8 +1424,8 @@ h3 {
     transform: scale(1);
   }
 
-  .iso-probe {
-    transform: translate(0px, -2px);
+  .iso-heartbeat {
+    stroke-dashoffset: 0;
   }
 }
 
@@ -1473,14 +1434,14 @@ h3 {
 .iso-svg:not(.in-view) .iso-race-win,
 .iso-svg:not(.in-view) .iso-race-block,
 .iso-svg:not(.in-view) .iso-chain-target,
-.iso-svg:not(.in-view) .iso-query-beam,
 .iso-svg:not(.in-view) .iso-diff-1,
 .iso-svg:not(.in-view) .iso-diff-2,
 .iso-svg:not(.in-view) .iso-diff-3,
 .iso-svg:not(.in-view) .iso-llm-pulse,
 .iso-svg:not(.in-view) .iso-chip,
 .iso-svg:not(.in-view) .iso-pulse,
-.iso-svg:not(.in-view) .iso-probe,
+.iso-svg:not(.in-view) .iso-heartbeat,
+.iso-svg:not(.in-view) .iso-poll-line,
 .iso-svg:not(.in-view) .iso-radar-sweep {
   animation-play-state: paused;
 }

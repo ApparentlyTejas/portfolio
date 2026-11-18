@@ -595,102 +595,162 @@ function pts(coords: Array<[number, number, number]>) {
   return coords.map(([x, y, z]) => { const p = iso(x, y, z); return `${p.x.toFixed(2)},${p.y.toFixed(2)}` }).join(' ')
 }
 
-type Shade = [top: number, right: number, front: number]
-const DEFAULT_SHADE: Shade = [1.4, 0.42, 0.8]
-
-// A box sitting on the ground: its base is at local z=0 (the group's own
-// translate places that base point), and it extends up by `h`. Three faces,
-// three flat shades — no gradients, no filters beyond brightness, so edges
-// stay perfectly crisp at any size instead of the soft div-border look.
-function IsoBox({ w = 14, d = 14, h = 14, color, shade = DEFAULT_SHADE, shadow = true, className, style }: {
-  w?: number
-  d?: number
-  h?: number
-  color: string
-  shade?: Shade
-  shadow?: boolean
-  className?: string
-  style?: React.CSSProperties
-}) {
-  const hw = w / 2
-  const hd = d / 2
-  return (
-    <g className={className} style={style}>
-      {shadow && (
-        <ellipse className="iso-shadow" cx={0} cy={0} rx={Math.max(w, d) * 0.62} ry={Math.max(w, d) * 0.32} />
-      )}
-      <polygon points={pts([[-hw, hd, h], [hw, hd, h], [hw, hd, 0], [-hw, hd, 0]])} fill={color} style={{ filter: `brightness(${shade[2]})` }} />
-      <polygon points={pts([[hw, -hd, h], [hw, hd, h], [hw, hd, 0], [hw, -hd, 0]])} fill={color} style={{ filter: `brightness(${shade[1]})` }} />
-      <polygon points={pts([[-hw, -hd, h], [hw, -hd, h], [hw, hd, h], [-hw, hd, h]])} fill={color} style={{ filter: `brightness(${shade[0]})` }} />
-    </g>
-  )
-}
-
 const T = (x: number, y: number) => ({ transform: `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)` })
 
 function RoomLockScene() {
   return (
     <>
-      <IsoBox w={20} d={6} h={24} color="var(--accent-blue)" style={T(34.64, 20)} />
-      <g className="iso-race-win"><IsoBox w={12} d={12} h={12} color="var(--accent-orange)" /></g>
-      <g className="iso-race-block"><IsoBox w={12} d={12} h={12} color="#e85656" /></g>
+      <ellipse className="iso-shadow" cx={34.64} cy={20} rx={17} ry={7} />
+
+      {/* A literal padlock standing at the gate: shackle, body, keyhole —
+          not a generic box, an actual recognizable lock. */}
+      <g style={T(34.64, 2)}>
+        <path d="M -6 7 L -6 -4 A 6 6 0 0 1 6 -4 L 6 7" fill="none" stroke="var(--accent-blue)" strokeWidth={4.5} strokeLinecap="round" />
+        <rect x={-12} y={3} width={24} height={20} rx={3} fill="var(--accent-blue)" />
+        <rect x={-12} y={3} width={24} height={5} rx={3} fill="#fff" opacity={0.28} />
+        <circle cx={0} cy={11} r={2.6} fill="#0d1017" />
+        <rect x={-1.1} y={12.5} width={2.2} height={6} fill="#0d1017" />
+      </g>
+
+      {/* Two booking requests racing for the lock: the winner's ticket
+          slides in and resolves, the loser's bounces off, flashing red. */}
+      <g className="iso-race-win">
+        <rect x={-7} y={-5} width={14} height={10} rx={2} fill="var(--accent-orange)" />
+        <rect x={-7} y={-5} width={14} height={3} rx={2} fill="#fff" opacity={0.3} />
+      </g>
+      <g className="iso-race-block">
+        <rect x={-7} y={-5} width={14} height={10} rx={2} fill="#e85656" />
+        <rect x={-7} y={-5} width={14} height={3} rx={2} fill="#fff" opacity={0.3} />
+      </g>
     </>
   )
 }
 
-// Amber/gold dominant, not blue — distinct from RoomLock's blue door and
-// DevPulse's blue agent so the four scenes don't all read as "blue cube."
-const CHAIN_BLOCK_COLORS = ['#8a6a1f', '#d99a2b', '#8a6a1f', '#d99a2b']
+// A fanned stack of evidence pages (not abstract cubes) — each one a log
+// entry, the top one hash-linked and lit up as the one a query traced to.
+const LOG_PAGES = [
+  { rot: -11, dy: 11, shade: '#6b5220' },
+  { rot: -4, dy: 5, shade: '#8a6a1f' },
+  { rot: 3, dy: -1, shade: '#b3841f' },
+  { rot: 10, dy: -8, shade: 'var(--accent-orange)' },
+]
 
 function IncidentLensScene() {
-  const base = iso(10, 6, 0)
   return (
     <>
-      {CHAIN_BLOCK_COLORS.map((color, i) => (
-        <g key={i} className={i === 2 ? 'iso-chain-target' : undefined} style={T(base.x, base.y - i * 14)}>
-          <IsoBox w={14} d={14} h={14} color={color} shadow={i === 0} />
+      <ellipse className="iso-shadow" cx={0} cy={16} rx={27} ry={9} />
+      {LOG_PAGES.map((p, i) => (
+        <g key={i} transform={`translate(${p.dy * 0.35}, ${p.dy}) rotate(${p.rot})`} className={i === 3 ? 'iso-chain-target' : undefined}>
+          <rect x={-20} y={-13} width={40} height={26} rx={3} fill={p.shade} stroke="rgba(0,0,0,0.25)" />
+          <rect x={-14} y={-6} width={22} height={2.4} rx={1.2} fill="rgba(0,0,0,0.28)" />
+          <rect x={-14} y={-0.5} width={16} height={2.4} rx={1.2} fill="rgba(0,0,0,0.28)" />
+          <rect x={-14} y={5} width={19} height={2.4} rx={1.2} fill="rgba(0,0,0,0.28)" />
+          <text x={9} y={-6} fontSize={9} fontFamily="var(--mono)" fill="rgba(0,0,0,0.3)">#</text>
         </g>
       ))}
-      <IsoBox w={11} d={11} h={11} color="var(--accent-blue)" style={T(-13.86, -26.5)} />
-      <g style={T(-15.59, -29)}>
-        <g transform="rotate(30)">
-          <rect className="iso-query-beam" x={0} y={-1.5} width={46} height={3} fill="var(--accent-blue)" />
-        </g>
+
+      {/* A magnifying glass actively verifying the traced entry — the role
+          query resolving to one specific, provable row, not a vague scan. */}
+      <g className="iso-pulse" style={T(17, -19)}>
+        <circle cx={0} cy={0} r={9} fill="rgba(91, 124, 255, 0.14)" stroke="var(--accent-blue)" strokeWidth={3} />
+        <line x1={6.4} y1={6.4} x2={13} y2={13} stroke="var(--accent-blue)" strokeWidth={4} strokeLinecap="round" />
+        <line x1={-4} y1={-3} x2={1.5} y2={-6.5} stroke="#fff" strokeOpacity={0.55} strokeWidth={2} strokeLinecap="round" />
       </g>
     </>
   )
 }
 
 function ReviewLensScene() {
-  // Literal git-diff colors: the LLM is reading a removed line, an added
-  // line, and a context line — not three generic gray bars.
   return (
     <>
-      <rect className="iso-diff-1" x={-1.5} y={-1.2} width={18} height={2.4} fill="#e85656" />
-      <rect className="iso-diff-2" x={-1.5} y={-1.2} width={18} height={2.4} fill="#56c285" style={{ animationDelay: '0.3s' }} />
-      <rect className="iso-diff-3" x={-1.5} y={-1.2} width={18} height={2.4} fill="#8b93a7" style={{ animationDelay: '0.6s' }} />
-      {/* Violet, not blue — this is the one scene about an LLM, so it gets
-          its own color instead of reusing the door/agent/role-cube blue. */}
-      <IsoBox w={20} d={20} h={20} color="#9a7bd9" className="iso-llm-pulse" />
-      <g style={T(29.44, 16)}><g className="iso-chip" style={{ animationDelay: '1.2s' }}><IsoBox w={10} d={10} h={10} color="#e85656" /></g></g>
-      <g style={T(29.44, 4)}><g className="iso-chip" style={{ animationDelay: '1.5s' }}><IsoBox w={10} d={10} h={10} color="var(--accent-orange)" /></g></g>
-      <g style={T(29.44, -8)}><g className="iso-chip" style={{ animationDelay: '1.8s' }}><IsoBox w={10} d={10} h={10} color="#56c285" /></g></g>
+      <ellipse className="iso-shadow" cx={-4} cy={20} rx={30} ry={8} />
+
+      {/* A real diff panel, not an abstract slab: title bar with the same
+          traffic-light dots as the site's terminal chrome, then literal
+          +/- lines in actual git-diff colors, revealed one by one as the
+          LLM reads them. */}
+      <g style={T(-4, -2)}>
+        <rect x={-24} y={-16} width={48} height={32} rx={3} fill="#12151d" stroke="rgba(0,0,0,0.3)" />
+        <rect x={-24} y={-16} width={48} height={7} rx={3} fill="#1b1f2a" />
+        <circle cx={-19} cy={-12.5} r={1.4} fill="#e85656" />
+        <circle cx={-14.5} cy={-12.5} r={1.4} fill="#ffa62b" />
+        <circle cx={-10} cy={-12.5} r={1.4} fill="#56c285" />
+
+        <g className="iso-diff-1">
+          <rect x={-21} y={-6} width={42} height={6} fill="#e85656" fillOpacity={0.28} />
+          <text x={-19.5} y={-1.6} fontSize={7} fontFamily="var(--mono)" fill="#e85656">-</text>
+        </g>
+        <g className="iso-diff-2" style={{ animationDelay: '0.35s' }}>
+          <rect x={-21} y={1} width={42} height={6} fill="#56c285" fillOpacity={0.28} />
+          <text x={-19.5} y={5.4} fontSize={7} fontFamily="var(--mono)" fill="#56c285">+</text>
+        </g>
+        <g className="iso-diff-3" style={{ animationDelay: '0.7s' }}>
+          <rect x={-21} y={8} width={42} height={6} fill="#8b93a7" fillOpacity={0.14} />
+        </g>
+      </g>
+
+      {/* The LLM reading it, drawn as a violet eye instead of a generic box
+          — this is the one scene that's actually about a model looking at
+          something. */}
+      <g className="iso-llm-pulse" style={T(32, -17)}>
+        <circle cx={0} cy={0} r={10} fill="#9a7bd9" />
+        <circle cx={0} cy={0} r={10} fill="none" stroke="#c6b2ea" strokeWidth={1.5} />
+        <circle cx={0} cy={0} r={4.2} fill="#0d1017" />
+        <circle cx={1.6} cy={-1.6} r={1.3} fill="#fff" fillOpacity={0.8} />
+      </g>
+
+      {/* Severity-ranked findings coming out the other side. */}
+      <g style={T(31, 7)}><g className="iso-chip" style={{ animationDelay: '1.2s' }}>
+        <rect x={-11} y={-5} width={22} height={10} rx={5} fill="#e85656" />
+        <text x={0} y={2.6} fontSize={6} fontFamily="var(--mono)" fill="#fff" textAnchor="middle">HIGH</text>
+      </g></g>
+      <g style={T(31, 19)}><g className="iso-chip" style={{ animationDelay: '1.5s' }}>
+        <rect x={-11} y={-5} width={22} height={10} rx={5} fill="var(--accent-orange)" />
+        <text x={0} y={2.6} fontSize={6} fontFamily="var(--mono)" fill="#1a1200" textAnchor="middle">MED</text>
+      </g></g>
+      <g style={T(31, 31)}><g className="iso-chip" style={{ animationDelay: '1.8s' }}>
+        <rect x={-11} y={-5} width={22} height={10} rx={5} fill="#56c285" />
+        <text x={0} y={2.6} fontSize={6} fontFamily="var(--mono)" fill="#042c13" textAnchor="middle">LOW</text>
+      </g></g>
     </>
   )
 }
 
 function DevPulseScene() {
-  const trace = 'rgba(91, 124, 255, 0.45)'
   return (
     <>
-      <polyline className="iso-trace" points={pts([[-50, 0, 1], [0, 0, 1]])} stroke={trace} />
-      <polyline className="iso-trace" points={pts([[0, -45, 1], [0, 0, 1]])} stroke={trace} />
-      <polyline className="iso-trace" points={pts([[45, 22, 1], [45, 0, 1], [0, 0, 1]])} stroke={trace} />
-      <IsoBox w={16} d={16} h={16} color="var(--accent-blue)" />
-      <g style={T(-43.3, -25.5)}><g className="iso-pulse" style={{ animationDelay: '0s' }}><IsoBox w={11} d={11} h={11} color="var(--accent-orange)" /></g></g>
-      <g style={T(38.97, -23)}><g className="iso-pulse" style={{ animationDelay: '0.6s' }}><IsoBox w={11} d={11} h={11} color="var(--accent-orange)" /></g></g>
-      <g style={T(19.92, 33)}><g className="iso-pulse" style={{ animationDelay: '1.2s' }}><IsoBox w={11} d={11} h={11} color="var(--accent-orange)" /></g></g>
-      <g className="iso-probe"><IsoBox w={6} d={6} h={6} color="#56c285" shadow={false} /></g>
+      <ellipse className="iso-shadow" cx={0} cy={22} rx={34} ry={9} />
+
+      {/* A literal monitor showing a live heartbeat trace, not an abstract
+          radar + cubes — this project's whole job is whether services are
+          alive right now. */}
+      <g style={T(0, -4)}>
+        <rect x={-30} y={-19} width={60} height={32} rx={3} fill="#0a1812" stroke="rgba(0,0,0,0.35)" />
+        <rect x={-30} y={-19} width={60} height={6} rx={3} fill="#102319" />
+        <circle cx={-25} cy={-16} r={1.3} fill="#56c285" />
+        <text x={-20.5} y={-14.3} fontSize={5} fontFamily="var(--mono)" fill="#56c285" fillOpacity={0.85}>LIVE</text>
+        <path
+          className="iso-heartbeat"
+          d="M -25 1 L -13 1 L -9 -9 L -5 11 L -1 -15 L 3 1 L 25 1"
+          fill="none"
+          stroke="#56c285"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </g>
+
+      {/* Three services it's watching, each a status light. */}
+      <g style={T(-24, 24)}><g className="iso-pulse" style={{ animationDelay: '0s' }}><circle r={4} fill="var(--accent-orange)" /></g></g>
+      <g style={T(0, 28)}><g className="iso-pulse" style={{ animationDelay: '0.5s' }}><circle r={4} fill="var(--accent-orange)" /></g></g>
+      <g style={T(24, 24)}><g className="iso-pulse" style={{ animationDelay: '1s' }}><circle r={4} fill="var(--accent-orange)" /></g></g>
+
+      {/* The agent, reading it live over MCP. */}
+      <g style={T(0, -35)}>
+        <circle r={9} fill="var(--accent-blue)" />
+        <path d="M -3.5 -1 L -1 2 L 4 -4" fill="none" stroke="#fff" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      </g>
+      <line className="iso-poll-line" x1={0} y1={-26} x2={0} y2={-23} stroke="var(--accent-blue)" strokeWidth={2} strokeDasharray="2 2" />
     </>
   )
 }
