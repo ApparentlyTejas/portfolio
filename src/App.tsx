@@ -119,6 +119,11 @@ const OSS_CONTRIBUTIONS = [
     desc: 'Corrected GEN3/GEN4 manufacturer, model number, and register tagging for the X1 Boost G4 / X1 Smart G2 / MIC Gen4 inverters.',
     prs: [{ label: '#2462', url: 'https://github.com/wills106/homeassistant-solax-modbus/pull/2462' }],
   },
+  {
+    repo: 'Salamek/cron-descriptor',
+    desc: "Fixed the OR/AND wording bug between day-of-month and day-of-week: a condition meant to catch lists and ranges was also matching day-of-month steps like */2, which real cron ANDs instead of ORs. Narrowed the check and added a regression test for both cases.",
+    prs: [{ label: '#119', url: 'https://github.com/Salamek/cron-descriptor/pull/119' }],
+  },
 ]
 
 const EXPERIENCE = [
@@ -639,9 +644,9 @@ function IsoCube({ size = 14, color, className, style, shadow = true }: {
   return (
     <div className={`iso-cube ${className ?? ''}`} style={style}>
       {shadow && <IsoShadow size={size * 1.5} depth={half} />}
-      <IsoFace w={size} h={size} color={color} orient="top" shade={1.25} depth={half} />
-      <IsoFace w={size} h={size} color={color} orient="left" shade={0.58} depth={half} />
-      <IsoFace w={size} h={size} color={color} orient="front" shade={0.9} depth={half} />
+      <IsoFace w={size} h={size} color={color} orient="top" shade={1.4} depth={half} />
+      <IsoFace w={size} h={size} color={color} orient="left" shade={0.42} depth={half} />
+      <IsoFace w={size} h={size} color={color} orient="front" shade={0.8} depth={half} />
     </div>
   )
 }
@@ -756,9 +761,23 @@ const PROJECT_GROUND: Record<string, string> = {
 
 function ProjectScene({ title }: { title: string }) {
   const Scene = PROJECT_SCENES[title]
+  const ref = useRef<HTMLDivElement>(null)
+  const [inView, setInView] = useState(false)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setInView(entry.isIntersecting),
+      { rootMargin: '80px' },
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
   if (!Scene) return null
   return (
-    <div className="iso-scene">
+    <div ref={ref} className={`iso-scene ${inView ? 'in-view' : ''}`}>
       <div className="iso-stage">
         <div className={`iso-ground ${PROJECT_GROUND[title] ?? 'iso-ground--grid'}`} />
         {PROJECT_GROUND[title] === 'iso-ground--radar' && <div className="iso-radar-sweep" />}

@@ -1224,7 +1224,10 @@ h3 {
   margin: 4px 0 18px;
   padding: 10px;
   border: 1px solid var(--surface-border);
-  perspective: 2000px;
+  /* A much closer camera than before — true isometric has zero perspective
+     convergence, which is exactly why it can read as flat. This pulls in
+     a real vanishing point so depth is unmistakable at a glance. */
+  perspective: 650px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1236,7 +1239,7 @@ h3 {
   width: 140px;
   height: 80px;
   transform-style: preserve-3d;
-  transform: rotateX(55deg) rotateZ(45deg) scale(2.5);
+  transform: rotateX(52deg) rotateZ(45deg) scale(2.5);
 }
 
 /* Each project stands on a different floor, so the four scenes read as
@@ -1346,8 +1349,28 @@ h3 {
   left: 0;
   display: block;
   border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0) 72%);
-  filter: blur(1.5px);
+  /* The gradient already fades softly on its own — a blur filter here is
+     expensive to composite on an animated, 3D-transformed element and adds
+     nothing a tighter gradient falloff doesn't already give for free. */
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.45) 0%, rgba(0, 0, 0, 0.18) 45%, rgba(0, 0, 0, 0) 75%);
+}
+
+/* Four scenes x ~9 infinite animations each adds up to real continuous
+   compositing work even when a card is nowhere near the viewport. A small
+   IntersectionObserver in ProjectScene toggles this class so only scenes
+   actually on screen keep animating — the rest hold their last frame. */
+.iso-scene:not(.in-view) .iso-race-win,
+.iso-scene:not(.in-view) .iso-race-block,
+.iso-scene:not(.in-view) .iso-chain-target,
+.iso-scene:not(.in-view) .iso-query-beam,
+.iso-scene:not(.in-view) .iso-diff-line,
+.iso-scene:not(.in-view) .iso-llm-pulse,
+.iso-scene:not(.in-view) .iso-chip,
+.iso-scene:not(.in-view) .iso-pulse,
+.iso-scene:not(.in-view) .iso-probe,
+.iso-scene:not(.in-view) .iso-ground--flow,
+.iso-scene:not(.in-view) .iso-radar-sweep {
+  animation-play-state: paused;
 }
 
 /* RoomLock: two requests race a lock; the winner passes through, the loser bounces off. */
@@ -1461,7 +1484,7 @@ h3 {
   }
 
   .iso-stage {
-    transform: rotateX(55deg) rotateZ(45deg) scale(2.0);
+    transform: rotateX(52deg) rotateZ(45deg) scale(2.0);
   }
 }
 
