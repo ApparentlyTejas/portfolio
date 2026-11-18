@@ -675,7 +675,9 @@ function RoomLockScene() {
   )
 }
 
-const CHAIN_BLOCK_COLORS = ['#3a4a8f', 'var(--accent-blue)', '#3a4a8f', 'var(--accent-blue)']
+// Amber/gold dominant, not blue — distinct from RoomLock's blue door and
+// DevPulse's blue agent so the four scenes don't all read as "blue cube."
+const CHAIN_BLOCK_COLORS = ['#8a6a1f', 'var(--accent-orange)', '#8a6a1f', 'var(--accent-orange)']
 
 function IncidentLensScene() {
   return (
@@ -689,7 +691,7 @@ function IncidentLensScene() {
           style={{ transform: `translate3d(10px, 6px, ${i * 14 + 1}px)` }}
         />
       ))}
-      <IsoCube size={11} color="var(--accent-orange)" style={{ transform: 'translate3d(-34px, -18px, 6px)' }} />
+      <IsoCube size={11} color="var(--accent-blue)" style={{ transform: 'translate3d(-34px, -18px, 6px)' }} />
       <div className="iso-query-beam" />
     </>
   )
@@ -707,7 +709,9 @@ function ReviewLensScene() {
       <IsoBar x={-10} y={-14} z={3} w={18} h={3} color="#e85656" orient="top" className="iso-diff-line" style={line(-14, '0s')} />
       <IsoBar x={-10} y={0} z={3} w={18} h={3} color="#56c285" orient="top" className="iso-diff-line" style={line(0, '0.3s')} />
       <IsoBar x={-10} y={14} z={3} w={18} h={3} color="#8b93a7" orient="top" className="iso-diff-line" style={line(14, '0.6s')} />
-      <IsoCube size={20} color="var(--accent-blue)" className="iso-llm-pulse" />
+      {/* Violet, not blue — this is the one scene about an LLM, so it gets
+          its own color instead of reusing the door/agent/role-cube blue. */}
+      <IsoCube size={20} color="#9a7bd9" className="iso-llm-pulse" />
       <IsoCube size={10} color="#e85656" className="iso-chip" style={chip(6, '1.2s')} />
       <IsoCube size={10} color="var(--accent-orange)" className="iso-chip" style={chip(18, '1.5s')} />
       <IsoCube size={10} color="#56c285" className="iso-chip" style={chip(30, '1.8s')} />
