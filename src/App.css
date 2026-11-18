@@ -1299,6 +1299,19 @@ h3 {
   animation: iso-race-block 4.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
+/* A quiet success ping right as the winning ticket reaches the lock. */
+.iso-lock-grant {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: iso-lock-grant 4.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes iso-lock-grant {
+  0%, 42% { opacity: 0; transform: scale(0.4); }
+  48% { opacity: 0.9; transform: scale(1); }
+  58%, 100% { opacity: 0; transform: scale(1.3); }
+}
+
 /* Incident Lens: a fanned stack of evidence pages, one lit up as the entry
    a role query actually traced to, with a magnifying glass verifying it. */
 .iso-chain-target {
@@ -1309,6 +1322,18 @@ h3 {
   0%, 35% { filter: brightness(1); }
   48%, 62% { filter: brightness(1.5); }
   75%, 100% { filter: brightness(1); }
+}
+
+.iso-verify-check {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: iso-verify-check 3.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes iso-verify-check {
+  0%, 44% { opacity: 0; transform: scale(0.3); }
+  52% { opacity: 1; transform: scale(1); }
+  70%, 100% { opacity: 0; transform: scale(1); }
 }
 
 /* ReviewLenzAI: a real diff panel whose +/- lines reveal one at a time as
@@ -1391,7 +1416,9 @@ h3 {
 @media (prefers-reduced-motion: reduce) {
   .iso-race-win,
   .iso-race-block,
+  .iso-lock-grant,
   .iso-chain-target,
+  .iso-verify-check,
   .iso-diff-1,
   .iso-diff-2,
   .iso-diff-3,
@@ -1410,6 +1437,15 @@ h3 {
 
   .iso-race-block {
     transform: translate(6.06px, 12.5px);
+  }
+
+  .iso-lock-grant {
+    opacity: 0;
+  }
+
+  .iso-verify-check {
+    opacity: 1;
+    transform: scale(1);
   }
 
   .iso-diff-1,
@@ -1433,7 +1469,9 @@ h3 {
    their last frame, via the IntersectionObserver in ProjectScene. */
 .iso-svg:not(.in-view) .iso-race-win,
 .iso-svg:not(.in-view) .iso-race-block,
+.iso-svg:not(.in-view) .iso-lock-grant,
 .iso-svg:not(.in-view) .iso-chain-target,
+.iso-svg:not(.in-view) .iso-verify-check,
 .iso-svg:not(.in-view) .iso-diff-1,
 .iso-svg:not(.in-view) .iso-diff-2,
 .iso-svg:not(.in-view) .iso-diff-3,

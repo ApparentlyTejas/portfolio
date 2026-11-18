@@ -597,19 +597,27 @@ function pts(coords: Array<[number, number, number]>) {
 
 const T = (x: number, y: number) => ({ transform: `translate(${x.toFixed(2)}px, ${y.toFixed(2)}px)` })
 
-function RoomLockScene() {
+function RoomLockScene({ uid }: { uid: string }) {
   return (
     <>
+      <defs>
+        <linearGradient id={`lockBody-${uid}`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#7c97ff" />
+          <stop offset="100%" stopColor="var(--accent-blue)" />
+        </linearGradient>
+      </defs>
       <ellipse className="iso-shadow" cx={34.64} cy={20} rx={17} ry={7} />
 
       {/* A literal padlock standing at the gate: shackle, body, keyhole —
           not a generic box, an actual recognizable lock. */}
       <g style={T(34.64, 2)}>
         <path d="M -6 7 L -6 -4 A 6 6 0 0 1 6 -4 L 6 7" fill="none" stroke="var(--accent-blue)" strokeWidth={4.5} strokeLinecap="round" />
-        <rect x={-12} y={3} width={24} height={20} rx={3} fill="var(--accent-blue)" />
+        <rect x={-12} y={3} width={24} height={20} rx={3} fill={`url(#lockBody-${uid})`} />
         <rect x={-12} y={3} width={24} height={5} rx={3} fill="#fff" opacity={0.28} />
         <circle cx={0} cy={11} r={2.6} fill="#0d1017" />
         <rect x={-1.1} y={12.5} width={2.2} height={6} fill="#0d1017" />
+        {/* A quiet "granted" flash right as the winning ticket lands. */}
+        <circle className="iso-lock-grant" cx={0} cy={11} r={16} fill="none" stroke="#56c285" strokeWidth={2} />
       </g>
 
       {/* Two booking requests racing for the lock: the winner's ticket
@@ -635,9 +643,16 @@ const LOG_PAGES = [
   { rot: 10, dy: -8, shade: 'var(--accent-orange)' },
 ]
 
-function IncidentLensScene() {
+function IncidentLensScene({ uid }: { uid: string }) {
   return (
     <>
+      <defs>
+        <radialGradient id={`glass-${uid}`} cx="35%" cy="30%">
+          <stop offset="0%" stopColor="rgba(255,255,255,0.35)" />
+          <stop offset="40%" stopColor="rgba(91,124,255,0.16)" />
+          <stop offset="100%" stopColor="rgba(91,124,255,0.1)" />
+        </radialGradient>
+      </defs>
       <ellipse className="iso-shadow" cx={0} cy={16} rx={27} ry={9} />
       {LOG_PAGES.map((p, i) => (
         <g key={i} transform={`translate(${p.dy * 0.35}, ${p.dy}) rotate(${p.rot})`} className={i === 3 ? 'iso-chain-target' : undefined}>
@@ -652,17 +667,30 @@ function IncidentLensScene() {
       {/* A magnifying glass actively verifying the traced entry — the role
           query resolving to one specific, provable row, not a vague scan. */}
       <g className="iso-pulse" style={T(17, -19)}>
-        <circle cx={0} cy={0} r={9} fill="rgba(91, 124, 255, 0.14)" stroke="var(--accent-blue)" strokeWidth={3} />
+        <circle cx={0} cy={0} r={9} fill={`url(#glass-${uid})`} stroke="var(--accent-blue)" strokeWidth={3} />
         <line x1={6.4} y1={6.4} x2={13} y2={13} stroke="var(--accent-blue)" strokeWidth={4} strokeLinecap="round" />
         <line x1={-4} y1={-3} x2={1.5} y2={-6.5} stroke="#fff" strokeOpacity={0.55} strokeWidth={2} strokeLinecap="round" />
+      </g>
+
+      {/* A quiet "verified" checkmark right as the traced page lights up. */}
+      <g className="iso-verify-check" style={T(27, -13)}>
+        <circle r={6} fill="#56c285" />
+        <path d="M -2.6 0 L -0.6 2 L 3 -2.2" fill="none" stroke="#fff" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
       </g>
     </>
   )
 }
 
-function ReviewLensScene() {
+function ReviewLensScene({ uid }: { uid: string }) {
   return (
     <>
+      <defs>
+        <radialGradient id={`eyeGlass-${uid}`} cx="35%" cy="30%">
+          <stop offset="0%" stopColor="#c6b2ea" />
+          <stop offset="60%" stopColor="#9a7bd9" />
+          <stop offset="100%" stopColor="#7c5fc2" />
+        </radialGradient>
+      </defs>
       <ellipse className="iso-shadow" cx={-4} cy={20} rx={30} ry={8} />
 
       {/* A real diff panel, not an abstract slab: title bar with the same
@@ -693,7 +721,7 @@ function ReviewLensScene() {
           — this is the one scene that's actually about a model looking at
           something. */}
       <g className="iso-llm-pulse" style={T(32, -17)}>
-        <circle cx={0} cy={0} r={10} fill="#9a7bd9" />
+        <circle cx={0} cy={0} r={10} fill={`url(#eyeGlass-${uid})`} />
         <circle cx={0} cy={0} r={10} fill="none" stroke="#c6b2ea" strokeWidth={1.5} />
         <circle cx={0} cy={0} r={4.2} fill="#0d1017" />
         <circle cx={1.6} cy={-1.6} r={1.3} fill="#fff" fillOpacity={0.8} />
@@ -716,9 +744,18 @@ function ReviewLensScene() {
   )
 }
 
-function DevPulseScene() {
+function DevPulseScene({ uid }: { uid: string }) {
   return (
     <>
+      <defs>
+        <filter id={`glow-${uid}`} x="-60%" y="-60%" width="220%" height="220%">
+          <feGaussianBlur stdDeviation="1.6" result="blur" />
+          <feMerge>
+            <feMergeNode in="blur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
       <ellipse className="iso-shadow" cx={0} cy={22} rx={34} ry={9} />
 
       {/* A literal monitor showing a live heartbeat trace, not an abstract
@@ -726,6 +763,11 @@ function DevPulseScene() {
           alive right now. */}
       <g style={T(0, -4)}>
         <rect x={-30} y={-19} width={60} height={32} rx={3} fill="#0a1812" stroke="rgba(0,0,0,0.35)" />
+        {/* Graph-paper grid, like an actual monitor readout. */}
+        <g stroke="#1c3326" strokeWidth={0.5}>
+          {[-23, -14, -5, 4, 13, 22].map((x) => <line key={`v${x}`} x1={x} y1={-12} x2={x} y2={12} />)}
+          {[-8, -2, 4, 10].map((y) => <line key={`h${y}`} x1={-27} y1={y} x2={27} y2={y} />)}
+        </g>
         <rect x={-30} y={-19} width={60} height={6} rx={3} fill="#102319" />
         <circle cx={-25} cy={-16} r={1.3} fill="#56c285" />
         <text x={-20.5} y={-14.3} fontSize={5} fontFamily="var(--mono)" fill="#56c285" fillOpacity={0.85}>LIVE</text>
@@ -737,6 +779,7 @@ function DevPulseScene() {
           strokeWidth={2}
           strokeLinecap="round"
           strokeLinejoin="round"
+          filter={`url(#glow-${uid})`}
         />
       </g>
 
@@ -755,7 +798,7 @@ function DevPulseScene() {
   )
 }
 
-const PROJECT_SCENES: Record<string, () => React.ReactElement> = {
+const PROJECT_SCENES: Record<string, (props: { uid: string }) => React.ReactElement> = {
   'RoomLock': RoomLockScene,
   'Incident Lens': IncidentLensScene,
   'ReviewLenzAI': ReviewLensScene,
@@ -868,7 +911,7 @@ function ProjectScene({ title }: { title: string }) {
         </defs>
         <g style={{ '--iso-shadow-fill': `url(#isoShadowGrad-${uid})` } as React.CSSProperties}>
           <IsoFloor variant={variant} uid={uid} />
-          <Scene />
+          <Scene uid={uid} />
         </g>
       </svg>
     </div>
