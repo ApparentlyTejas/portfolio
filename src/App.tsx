@@ -589,6 +589,14 @@ function IsoFace({ w, h, color, orient, shade = 1, depth = 0 }: {
   depth?: number
 }) {
   const rot = orient === 'top' ? 'rotateX(90deg)' : orient === 'left' ? 'rotateY(-90deg)' : ''
+  // A soft diagonal sheen plus a falloff toward the far corner, layered over
+  // the flat shade, so each face reads as lit material instead of a solid
+  // swatch — the thing that actually sells "rendered" over "colored box."
+  const sheen = orient === 'top'
+    ? 'linear-gradient(135deg, rgba(255,255,255,0.4), rgba(255,255,255,0) 60%)'
+    : orient === 'left'
+      ? 'linear-gradient(135deg, rgba(255,255,255,0.12), rgba(0,0,0,0.12) 75%)'
+      : 'linear-gradient(135deg, rgba(255,255,255,0.22), rgba(0,0,0,0.05) 70%)'
   return (
     <span
       className="iso-face"
@@ -597,7 +605,7 @@ function IsoFace({ w, h, color, orient, shade = 1, depth = 0 }: {
         height: h,
         marginTop: -h / 2,
         marginLeft: -w / 2,
-        background: color,
+        background: `${sheen}, ${color}`,
         filter: shade !== 1 ? `brightness(${shade})` : undefined,
         transform: `${rot} translateZ(${depth}px)`.trim(),
       }}
@@ -605,18 +613,35 @@ function IsoFace({ w, h, color, orient, shade = 1, depth = 0 }: {
   )
 }
 
-function IsoCube({ size = 14, color, className, style }: {
+function IsoShadow({ size, depth }: { size: number; depth: number }) {
+  return (
+    <span
+      className="iso-shadow"
+      style={{
+        width: size,
+        height: size,
+        marginTop: -size / 2,
+        marginLeft: -size / 2,
+        transform: `rotateX(90deg) translateZ(${-depth}px)`,
+      }}
+    />
+  )
+}
+
+function IsoCube({ size = 14, color, className, style, shadow = true }: {
   size?: number
   color: string
   className?: string
   style?: React.CSSProperties
+  shadow?: boolean
 }) {
   const half = size / 2
   return (
     <div className={`iso-cube ${className ?? ''}`} style={style}>
-      <IsoFace w={size} h={size} color={color} orient="top" shade={1.2} depth={half} />
-      <IsoFace w={size} h={size} color={color} orient="left" shade={0.64} depth={half} />
-      <IsoFace w={size} h={size} color={color} orient="front" shade={0.92} depth={half} />
+      {shadow && <IsoShadow size={size * 1.5} depth={half} />}
+      <IsoFace w={size} h={size} color={color} orient="top" shade={1.25} depth={half} />
+      <IsoFace w={size} h={size} color={color} orient="left" shade={0.58} depth={half} />
+      <IsoFace w={size} h={size} color={color} orient="front" shade={0.9} depth={half} />
     </div>
   )
 }
@@ -687,16 +712,17 @@ function ReviewLensScene() {
 }
 
 function DevPulseScene() {
+  const trace = 'rgba(91, 124, 255, 0.4)'
   return (
     <>
       <IsoCube size={16} color="var(--accent-blue)" style={{ transform: 'translate3d(0px, 0px, 8px)' }} />
-      <IsoBar x={-17} y={0} z={2} w={36} h={3} color="var(--surface-border)" />
-      <IsoBar x={0} y={-15} z={2} w={3} h={32} color="var(--surface-border)" />
-      <IsoBar x={15} y={0} z={2} w={32} h={3} color="var(--surface-border)" />
-      <IsoBar x={30} y={7} z={2} w={3} h={16} color="var(--surface-border)" />
-      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(-34px, 0px, 6px)', animationDelay: '0s' }} />
-      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(0px, -30px, 6px)', animationDelay: '0.6s' }} />
-      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(30px, 15px, 6px)', animationDelay: '1.2s' }} />
+      <IsoBar x={-25} y={0} z={2} w={50} h={3} color={trace} />
+      <IsoBar x={0} y={-22} z={2} w={3} h={46} color={trace} />
+      <IsoBar x={22} y={0} z={2} w={46} h={3} color={trace} />
+      <IsoBar x={45} y={11} z={2} w={3} h={24} color={trace} />
+      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(-50px, 0px, 6px)', animationDelay: '0s' }} />
+      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(0px, -45px, 6px)', animationDelay: '0.6s' }} />
+      <IsoCube size={11} color="var(--accent-orange)" className="iso-pulse" style={{ transform: 'translate3d(45px, 22px, 6px)', animationDelay: '1.2s' }} />
       <IsoCube size={6} color="#56c285" className="iso-probe" />
     </>
   )

@@ -1252,7 +1252,11 @@ h3 {
   background-size: 15px 15px;
   background-color: var(--surface);
   transform: rotateX(90deg) translateZ(0);
-  opacity: 0.7;
+  opacity: 0.8;
+  /* Fade the grid out toward the edges instead of cutting it off hard —
+     reads like a lit studio floor rather than a tiled texture. */
+  mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle at center, black 35%, transparent 72%);
 }
 
 .iso-cube {
@@ -1267,7 +1271,17 @@ h3 {
   top: 0;
   left: 0;
   display: block;
-  border: 1px solid rgba(0, 0, 0, 0.32);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.22);
+}
+
+.iso-shadow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0) 72%);
+  filter: blur(1.5px);
 }
 
 /* RoomLock: two requests race a lock; the winner passes through, the loser bounces off. */
@@ -1289,11 +1303,11 @@ h3 {
 }
 
 .iso-race-win {
-  animation: iso-race-win 4.2s ease-in-out infinite;
+  animation: iso-race-win 4.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 .iso-race-block {
-  animation: iso-race-block 4.2s ease-in-out infinite;
+  animation: iso-race-block 4.2s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 /* Incident Lens: a role query beams into a hash-chained block tower and lights up the traced one. */
@@ -1304,7 +1318,7 @@ h3 {
 }
 
 .iso-chain-target {
-  animation: iso-chain-pulse 3.8s ease-in-out infinite;
+  animation: iso-chain-pulse 3.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 @keyframes iso-query-beam {
@@ -1321,7 +1335,7 @@ h3 {
   height: 3px;
   background: var(--accent-orange);
   transform-origin: left center;
-  animation: iso-query-beam 3.8s ease-in-out infinite;
+  animation: iso-query-beam 3.8s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 /* ReviewLenzAI: diff lines flow into the LLM box, ranked severity chips come out. */
@@ -1332,7 +1346,7 @@ h3 {
 }
 
 .iso-diff-line {
-  animation: iso-diff-flow 3.6s ease-in-out infinite;
+  animation: iso-diff-flow 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 @keyframes iso-llm-pulse {
@@ -1342,7 +1356,7 @@ h3 {
 }
 
 .iso-llm-pulse {
-  animation: iso-llm-pulse 3.6s ease-in-out infinite;
+  animation: iso-llm-pulse 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 @keyframes iso-chip-in {
@@ -1351,7 +1365,7 @@ h3 {
 }
 
 .iso-chip {
-  animation: iso-chip-in 3.6s ease-in-out infinite;
+  animation: iso-chip-in 3.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 /* DevPulse: service nodes breathe, a probe travels the trace back to the agent. */
@@ -1361,14 +1375,14 @@ h3 {
 }
 
 .iso-pulse {
-  animation: iso-pulse 2.6s ease-in-out infinite;
+  animation: iso-pulse 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
 }
 
 @keyframes iso-probe {
-  0%, 4% { transform: translate3d(30px, 15px, 5px); }
-  35% { transform: translate3d(30px, 0px, 5px); }
+  0%, 4% { transform: translate3d(45px, 22px, 5px); }
+  35% { transform: translate3d(45px, 0px, 5px); }
   65% { transform: translate3d(0px, 0px, 5px); }
-  96%, 100% { transform: translate3d(30px, 15px, 5px); }
+  96%, 100% { transform: translate3d(45px, 22px, 5px); }
 }
 
 .iso-probe {
