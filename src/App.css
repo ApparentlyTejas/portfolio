@@ -1220,12 +1220,15 @@ h3 {
    built from real CSS 3D (preserve-3d + rotateX/rotateY + translateZ). */
 .iso-scene {
   position: relative;
-  height: 118px;
-  margin: 2px 0 14px;
-  perspective: 820px;
+  height: 320px;
+  margin: 4px 0 18px;
+  padding: 10px;
+  border: 1px solid var(--surface-border);
+  perspective: 2200px;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .iso-stage {
@@ -1233,7 +1236,7 @@ h3 {
   width: 140px;
   height: 80px;
   transform-style: preserve-3d;
-  transform: rotateX(55deg) rotateZ(45deg);
+  transform: rotateX(55deg) rotateZ(45deg) scale(2.9);
 }
 
 .iso-ground {
@@ -1374,11 +1377,11 @@ h3 {
 
 @media (max-width: 860px) {
   .iso-scene {
-    height: 104px;
+    height: 260px;
   }
 
   .iso-stage {
-    transform: rotateX(55deg) rotateZ(45deg) scale(0.82);
+    transform: rotateX(55deg) rotateZ(45deg) scale(2.3);
   }
 }
 
