@@ -98,11 +98,13 @@ const PROJECTS = [
 const OSS_CONTRIBUTIONS = [
   {
     repo: 'dbos-inc/dbos-transact-py',
-    desc: 'Fixed two SQLite concurrency bugs (a shared concurrency budget overspend and transaction write skew) with deterministic tests, and closed a silent migration race where DBOS.migrate() ran without its advisory lock.',
-    prs: [
-      { label: '#943', url: 'https://github.com/dbos-inc/dbos-transact-py/pull/943' },
-      { label: '#958', url: 'https://github.com/dbos-inc/dbos-transact-py/pull/958' },
-    ],
+    desc: 'Fixed two SQLite concurrency bugs (a shared concurrency budget overspend and transaction write skew) with deterministic tests.',
+    prs: [{ label: '#943', url: 'https://github.com/dbos-inc/dbos-transact-py/pull/943' }],
+  },
+  {
+    repo: 'dbos-inc/dbos-transact-py',
+    desc: 'Closed a silent migration race where DBOS.migrate() ran without its advisory lock, so a timed-out migration failed loudly instead of leaving the schema half-applied.',
+    prs: [{ label: '#958', url: 'https://github.com/dbos-inc/dbos-transact-py/pull/958' }],
   },
   {
     repo: 'kornia/kornia',
@@ -1289,7 +1291,7 @@ function App() {
         <CommandHeader>$ git log --author=tejas --merged --upstream</CommandHeader>
         <StaggerGrid className="oss-grid">
           {OSS_CONTRIBUTIONS.map((c, i) => (
-            <motion.div className="oss-card" key={c.repo} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
+            <motion.div className="oss-card" key={c.prs[0].url} variants={staggerItem} whileHover={{ y: -4, transition: { duration: 0.2, ease: EASE } }}>
               <div className="project-head">
                 <span className="card-index">{String(i + 1).padStart(2, '0')}</span>
                 <span className="project-category">{c.repo}</span>
