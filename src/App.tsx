@@ -121,8 +121,11 @@ const OSS_CONTRIBUTIONS = [
   },
   {
     repo: 'Salamek/cron-descriptor',
-    desc: "Fixed the OR/AND wording bug between day-of-month and day-of-week: a condition meant to catch lists and ranges was also matching day-of-month steps like */2, which real cron ANDs instead of ORs. Narrowed the check and added a regression test for both cases.",
-    prs: [{ label: '#119', url: 'https://github.com/Salamek/cron-descriptor/pull/119' }],
+    desc: "Fixed the OR/AND wording bug between day-of-month and day-of-week (a condition meant to catch lists and ranges was also matching day-of-month steps like */2, which real cron ANDs instead of ORs), and separately found that an out-of-range day-of-week digit like '0' silently became -1 and crashed deep inside segment generation with an opaque ValueError. Added a proper range check that raises the library's own FormatError instead, plus regression tests for both bugs.",
+    prs: [
+      { label: '#119', url: 'https://github.com/Salamek/cron-descriptor/pull/119' },
+      { label: '#115', url: 'https://github.com/Salamek/cron-descriptor/pull/115' },
+    ],
   },
 ]
 
